@@ -1,0 +1,7 @@
+使用库:
+qrcode
+pip install pyqart
+Pillow
+
+
+生成二维码大小: 50px -- 800px
