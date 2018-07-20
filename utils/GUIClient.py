@@ -40,10 +40,11 @@ class GUIClient(QMainWindow):
         self.config['none_icon'] = QIcon('')
 
     """
-    先做一个 600 * 400 居中的项目
+    项目初始化
     """
     def initUI(self):
         self.initMenu() # 初始化菜单
+        self.pageRender()   # 界面渲染
 
         self.resize(self.config['window_width'], self.config['window_height'])   # 设置窗口大小
         self.center()   # 窗口居中
@@ -84,21 +85,48 @@ class GUIClient(QMainWindow):
         self.batch.setShortcut('Ctrl+B')
         self.batch.triggered.connect(self.chooseGenetateType)
 
+    """
+    菜单点击事件
+    - 单个生成
+    - 批量生成
+    """
     def chooseGenetateType(self, e):
-        print(self.is_single)
         text = self.sender().text()
         if text == '单个生成':
             if self.is_single: return  # 如果已经是单个生成的状态, 直接返回
-            print('设置为单个')
             self.single.setIcon(self.config.get('spot_icon'))
             self.batch.setIcon(self.config.get('none_icon'))
             self.is_single = True
+            self.singlePageRender()
         elif text == '批量生成':
             if not self.is_single: return # 如果已经是批量生成的状态, 直接返回
-            print('设置为批量')
             self.single.setIcon(self.config.get('none_icon'))
             self.batch.setIcon(self.config.get('spot_icon'))
             self.is_single = False
+            self.batchPageRender()
+
+    """
+    界面渲染
+    """
+    def pageRender(self):
+        if self.is_single:
+            self.singlePageRender()
+        else:
+            self.batchPageRender()
+
+    """
+    渲染单个二维码生成界面
+    """
+    def singlePageRender(self):
+        print('singlePageRender')
+        pass
+
+    """
+    渲染批量生成二维码界面
+    """
+    def batchPageRender(self):
+        print('batchPageRender')
+        pass
 
     """
     窗口居中
