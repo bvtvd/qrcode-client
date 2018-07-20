@@ -24,6 +24,7 @@ class GUIClient(QMainWindow):
     is_single = False
 
     def __init__(self, **kwargs):
+        print('---__init__---')
         super(GUIClient, self).__init__()
         self.initConfig(**kwargs)
         self.initUI()
@@ -32,6 +33,7 @@ class GUIClient(QMainWindow):
     初始化传入配置项
     """
     def initConfig(self, **kwargs):
+        print('---initConfig---')
         self.config['window_width'] = kwargs.get('window_width', 800)
         self.config['window_height'] = kwargs.get('window_height', 400)
         self.config['window_title'] = kwargs.get('window_title', '二维码生成器')
@@ -43,6 +45,7 @@ class GUIClient(QMainWindow):
     项目初始化
     """
     def initUI(self):
+        print('---initUI---')
         self.initMenu() # 初始化菜单
         self.pageRender()   # 界面渲染
 
@@ -56,6 +59,7 @@ class GUIClient(QMainWindow):
     初始化菜单
     """
     def initMenu(self):
+        print('---initMenu---')
         menuBar = self.menuBar()
         menuMenu = menuBar.addMenu('&菜单')
         self.setMenuSingle(self.config.get('spot_icon'))
@@ -71,26 +75,29 @@ class GUIClient(QMainWindow):
     设置单个生成菜单
     """
     def setMenuSingle(self, icon):
+        print('---setMenuSingle---')
         if(icon == self.config.get('spot_icon')): self.is_single = True
         self.single = QAction(icon, '单个生成', self)
         self.single.setShortcut('Ctrl+S')
-        self.single.triggered.connect(self.chooseGenetateType)
+        self.single.triggered.connect(self.chooseGenerateType)
 
     """
     设置批量生成菜单
     """
     def setMenuBatch(self, icon):
+        print('---setMenuBatch---')
         if (icon == self.config.get('spot_icon')): self.is_single = False
         self.batch = QAction(icon, '批量生成', self)
         self.batch.setShortcut('Ctrl+B')
-        self.batch.triggered.connect(self.chooseGenetateType)
+        self.batch.triggered.connect(self.chooseGenerateType)
 
     """
     菜单点击事件
     - 单个生成
     - 批量生成
     """
-    def chooseGenetateType(self, e):
+    def chooseGenerateType(self, e):
+        print('---chooseGenerateType---')
         text = self.sender().text()
         if text == '单个生成':
             if self.is_single: return  # 如果已经是单个生成的状态, 直接返回
@@ -109,6 +116,7 @@ class GUIClient(QMainWindow):
     界面渲染
     """
     def pageRender(self):
+        print('---pageRender---')
         if self.is_single:
             self.singlePageRender()
         else:
@@ -118,20 +126,22 @@ class GUIClient(QMainWindow):
     渲染单个二维码生成界面
     """
     def singlePageRender(self):
-        print('singlePageRender')
+        print('---singlePageRender---')
+        
         pass
 
     """
     渲染批量生成二维码界面
     """
     def batchPageRender(self):
-        print('batchPageRender')
+        print('---batchPageRender---')
         pass
 
     """
     窗口居中
     """
     def center(self):
+        print('---center---')
         qr = self.frameGeometry()   # 得到主窗口大小
         cp = QDesktopWidget().availableGeometry().center()  # 获取显示器分辨率, 得到中间点位置
         qr.moveCenter(cp)   # 将窗口中心点放置到qr的中心点
