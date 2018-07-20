@@ -9,7 +9,7 @@
 """
 
 import sys
-from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QApplication, QAction
+from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QApplication, QAction, QHBoxLayout, QVBoxLayout, QTextEdit, QPushButton, QWidget
 from PyQt5.QtGui import QIcon
 
 class GUIClient(QMainWindow):
@@ -23,6 +23,14 @@ class GUIClient(QMainWindow):
     # 是否是单个生成状态记录
     is_single = False
 
+    """
+    **kwargs:
+        window_width: 窗口宽
+        window_height:  窗口高
+        window_title:   窗口标题
+        window_icon:    窗口Icon
+        spot_icon:  菜单选中点图标
+    """
     def __init__(self, **kwargs):
         print('---__init__---')
         super(GUIClient, self).__init__()
@@ -31,6 +39,11 @@ class GUIClient(QMainWindow):
 
     """
     初始化传入配置项
+    window_width: 窗口宽
+    window_height:  窗口高
+    window_title:   窗口标题
+    window_icon:    窗口Icon
+    spot_icon:  菜单选中点图标
     """
     def initConfig(self, **kwargs):
         print('---initConfig---')
@@ -124,11 +137,27 @@ class GUIClient(QMainWindow):
 
     """
     渲染单个二维码生成界面
+    两个v, 一个h
     """
     def singlePageRender(self):
         print('---singlePageRender---')
-        
-        pass
+        singleWidget = QWidget()    # 实例化一个QWidget对象
+        self.setCentralWidget(singleWidget) # 将其放在 主窗口中间
+
+        vboxLeft = QVBoxLayout()
+        vboxRight = QVBoxLayout()
+        hbox = QHBoxLayout()
+
+        # 生成左边控件, 一个输入框, 一个按钮
+        textEdit = QTextEdit()
+        createButton = QPushButton('生成二维码')
+        vboxLeft.addStretch(2)
+        vboxLeft.addWidget(textEdit)
+        vboxLeft.addWidget(createButton)
+
+        hbox.addLayout(vboxLeft)
+
+        singleWidget.setLayout(hbox)
 
     """
     渲染批量生成二维码界面
