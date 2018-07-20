@@ -9,25 +9,96 @@
 """
 
 import sys
-from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QApplication
+from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QApplication, QAction
 from PyQt5.QtGui import QIcon
 
 class GUIClient(QMainWindow):
 
+    # 视窗配置项
+    config = {}
+    # 单个生成二维码选项
+    single = None
+    # 批量生成二维码选项
+    batch = None
+    # 是否是单个生成状态记录
+    is_single = False
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         super(GUIClient, self).__init__()
+        self.initConfig(**kwargs)
         self.initUI()
+
+    """
+    初始化传入配置项
+    """
+    def initConfig(self, **kwargs):
+        self.config['window_width'] = kwargs.get('window_width', 800)
+        self.config['window_height'] = kwargs.get('window_height', 400)
+        self.config['window_title'] = kwargs.get('window_title', '二维码生成器')
+        self.config['window_icon'] = kwargs.get('window_icon', '../images/icon-qrcode.png')
+        self.config['spot_icon'] = QIcon(kwargs.get('spot_icon', '../images/spot.png'))
+        self.config['none_icon'] = QIcon('')
 
     """
     先做一个 600 * 400 居中的项目
     """
     def initUI(self):
-        self.resize(800, 400)   # 设置窗口大小
+        self.initMenu() # 初始化菜单
+
+        self.resize(self.config['window_width'], self.config['window_height'])   # 设置窗口大小
         self.center()   # 窗口居中
-        self.setWindowTitle('二维码生成器')   # 窗口标题
-        self.setWindowIcon(QIcon('./images/icon-qrcode.png'))   # 设置窗口icon
+        self.setWindowTitle(self.config['window_title'])   # 窗口标题
+        self.setWindowIcon(QIcon(self.config['window_icon']))   # 设置窗口icon
         self.show()
+
+    """
+    初始化菜单
+    """
+    def initMenu(self):
+        menuBar = self.menuBar()
+        menuMenu = menuBar.addMenu('&菜单')
+        self.setMenuSingle(self.config.get('spot_icon'))
+        self.setMenuBatch(self.config.get('none_icon'))
+        menuMenu.addAction(self.single)
+        menuMenu.addAction(self.batch)
+        menuMenu.addSeparator()
+        menuMenu.addAction('设置')
+        menuMenu.addSeparator()
+        menuMenu.addAction('退出')
+
+    """
+    设置单个生成菜单
+    """
+    def setMenuSingle(self, icon):
+        if(icon == self.config.get('spot_icon')): self.is_single = True
+        self.single = QAction(icon, '单个生成', self)
+        self.single.setShortcut('Ctrl+S')
+        self.single.triggered.connect(self.chooseGenetateType)
+
+    """
+    设置批量生成菜单
+    """
+    def setMenuBatch(self, icon):
+        if (icon == self.config.get('spot_icon')): self.is_single = False
+        self.batch = QAction(icon, '批量生成', self)
+        self.batch.setShortcut('Ctrl+B')
+        self.batch.triggered.connect(self.chooseGenetateType)
+
+    def chooseGenetateType(self, e):
+        print(self.is_single)
+        text = self.sender().text()
+        if text == '单个生成':
+            if self.is_single: return  # 如果已经是单个生成的状态, 直接返回
+            print('设置为单个')
+            self.single.setIcon(self.config.get('spot_icon'))
+            self.batch.setIcon(self.config.get('none_icon'))
+            self.is_single = True
+        elif text == '批量生成':
+            if not self.is_single: return # 如果已经是批量生成的状态, 直接返回
+            print('设置为批量')
+            self.single.setIcon(self.config.get('none_icon'))
+            self.batch.setIcon(self.config.get('spot_icon'))
+            self.is_single = False
 
     """
     窗口居中

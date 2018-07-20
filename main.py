@@ -12,6 +12,15 @@ from PyQt5.QtWidgets import QApplication
 from utils.GUIClient import GUIClient
 
 if __name__ == '__main__':
+
+    config = {
+        'window_width': 800,
+        'window_height': 400,
+        'window_title': '二维码生成器',
+        'window_icon': './images/icon-qrcode.png',
+        'spot_icon': './images/spot.png',
+    }
+
     app = QApplication(sys.argv)
-    client = GUIClient()
+    client = GUIClient(**config)
     sys.exit(app.exec_())
