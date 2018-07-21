@@ -9,7 +9,7 @@
 """
 
 import sys
-from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QApplication, QAction, QHBoxLayout, QVBoxLayout, QTextEdit, QPushButton, QWidget
+from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QApplication, QAction, QHBoxLayout, QVBoxLayout, QTextEdit, QPushButton, QWidget, QLabel, QFrame, QGridLayout, QMessageBox
 from PyQt5.QtGui import QIcon
 
 class GUIClient(QMainWindow):
@@ -22,6 +22,10 @@ class GUIClient(QMainWindow):
     batch = None
     # 是否是单个生成状态记录
     is_single = False
+    # 单个二维码生成输入框
+    singleQRCodeTextEdit = None
+    # 单个二维码生成页面
+    singleWidget = None
 
     """
     **kwargs:
@@ -141,23 +145,45 @@ class GUIClient(QMainWindow):
     """
     def singlePageRender(self):
         print('---singlePageRender---')
-        singleWidget = QWidget()    # 实例化一个QWidget对象
-        self.setCentralWidget(singleWidget) # 将其放在 主窗口中间
+        self.singleWidget = QWidget()    # 实例化一个QWidget对象
+        self.singleWidget.resize(100, 100)
+        self.setCentralWidget(self.singleWidget) # 将其放在 主窗口中间
 
-        vboxLeft = QVBoxLayout()
-        vboxRight = QVBoxLayout()
-        hbox = QHBoxLayout()
+        # 还是使用绝对定位好
+        self.singleQRCodeTextEdit = QTextEdit(self.singleWidget)
+        self.singleQRCodeTextEdit.setFontPointSize(16)
+        self.singleQRCodeTextEdit.resize(350, 200)
+        self.singleQRCodeTextEdit.move(50, 50)
+        createButton = QPushButton('生成二维码', self.singleWidget)
+        createButton.resize(120, 35)
+        createButton.move(281, 270)
+        createButton.clicked.connect(self.singleQRCodeCreate)
 
-        # 生成左边控件, 一个输入框, 一个按钮
-        textEdit = QTextEdit()
-        createButton = QPushButton('生成二维码')
-        vboxLeft.addStretch(2)
-        vboxLeft.addWidget(textEdit)
-        vboxLeft.addWidget(createButton)
 
-        hbox.addLayout(vboxLeft)
+        preview = QLabel('预览: ', self.singleWidget)  # 预览字符
+        preview.move(450, 25)
+        preview.resize(100, 20)
+        previewSquare = QFrame(self.singleWidget)  # 二维码生成显示区域
+        previewSquare.resize(200, 200)
+        previewSquare.setStyleSheet("QWidget { background-color: white }")
+        previewSquare.move(450, 50)
+        logo = QPushButton('贴图', self.singleWidget)
+        logo.resize(80, 35)
+        logo.move(450, 270)
+        style = QPushButton('样式', self.singleWidget)
+        style.resize(80, 35)
+        style.move(570, 270)
 
-        singleWidget.setLayout(hbox)
+    """
+    单个二维码生成
+    """
+    def singleQRCodeCreate(self):
+        print('---singleQRCodeCreate---')
+        content = self.singleQRCodeTextEdit.toPlainText()   # 获取出入内容
+        if content:
+            pass
+        else:
+            QMessageBox.warning(self, '  ', '请输入需要生成二维码的内容')
 
     """
     渲染批量生成二维码界面
