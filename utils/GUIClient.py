@@ -10,7 +10,9 @@
 
 import sys
 from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QApplication, QAction, QHBoxLayout, QVBoxLayout, QTextEdit, QPushButton, QWidget, QLabel, QFrame, QGridLayout, QMessageBox
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QPixmap, QPicture, QImage
+from utils.QRCode import QRCode
+from PIL import Image
 
 class GUIClient(QMainWindow):
 
@@ -26,6 +28,8 @@ class GUIClient(QMainWindow):
     singleQRCodeTextEdit = None
     # 单个二维码生成页面
     singleWidget = None
+    # 单个二维码预览空间
+    previewSquare = None
 
     """
     **kwargs:
@@ -163,10 +167,10 @@ class GUIClient(QMainWindow):
         preview = QLabel('预览: ', self.singleWidget)  # 预览字符
         preview.move(450, 25)
         preview.resize(100, 20)
-        previewSquare = QFrame(self.singleWidget)  # 二维码生成显示区域
-        previewSquare.resize(200, 200)
-        previewSquare.setStyleSheet("QWidget { background-color: white }")
-        previewSquare.move(450, 50)
+        self.previewSquare = QLabel(self.singleWidget)  # 二维码生成显示区域
+        self.previewSquare.resize(200, 200)
+        self.previewSquare.setStyleSheet("QWidget { background-color: white }")
+        self.previewSquare.move(450, 50)
         logo = QPushButton('贴图', self.singleWidget)
         logo.resize(80, 35)
         logo.move(450, 270)
@@ -181,7 +185,13 @@ class GUIClient(QMainWindow):
         print('---singleQRCodeCreate---')
         content = self.singleQRCodeTextEdit.toPlainText()   # 获取出入内容
         if content:
-            pass
+            # 生成二维码图像
+            QRTool = QRCode()
+            # img = QRTool.Usage(content)
+            img = Image.open('./utils/halftone-color.png')
+            # 展示在预览区
+            pixmap = QPixmap.fromImage(QImage.fromData(img))
+            self.previewSquare.setPicture(pixmap)
         else:
             QMessageBox.warning(self, '  ', '请输入需要生成二维码的内容')
 

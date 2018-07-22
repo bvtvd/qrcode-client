@@ -86,11 +86,12 @@ class QRCode:
         qr.add_data(content)
         qr.make(fit=True)
         img = qr.make_image()
+        return img
         return img.resize((size, size))
 
 
 if __name__ == '__main__':
     tool = QRCode()
-    # tool.make('这就是你的不对了', 800).save('1.png')
-    img = tool.HalftoneColorful()
-    img.show()
+    tool.make('这就是你的不对了', 800).show()
+    # img = tool.HalftoneColorful()
+    # img.show()
