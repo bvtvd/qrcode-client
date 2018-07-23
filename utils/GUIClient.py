@@ -9,8 +9,9 @@
 """
 
 import sys
-from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QApplication, QAction, QHBoxLayout, QVBoxLayout, QTextEdit, QPushButton, QWidget, QLabel, QFrame, QGridLayout, QMessageBox, QFileDialog
+from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QApplication, QAction, QHBoxLayout, QVBoxLayout, QTextEdit, QPushButton, QWidget, QLabel, QFrame, QGridLayout, QMessageBox, QFileDialog, QSlider
 from PyQt5.QtGui import QIcon, QPixmap, QPicture, QImage
+from PyQt5.QtCore import Qt
 from utils.QRCode import QRCode
 from PIL import Image
 
@@ -33,6 +34,8 @@ class GUIClient(QMainWindow):
     previewSquare = None
     # 批量二维码生成页面
     batchWidget = None
+    # 单个二维码生成滑条数值
+    pictureSizeValue = 280
 
     """
     **kwargs:
@@ -167,7 +170,6 @@ class GUIClient(QMainWindow):
         createButton.move(501, 350)
         createButton.clicked.connect(self.singleQRCodePreview)
 
-
         preview = QLabel('预览: ', self.singleWidget)  # 预览字符
         preview.move(670, 25)
         preview.resize(100, 20)
@@ -185,8 +187,28 @@ class GUIClient(QMainWindow):
         download.resize(80, 35)
         download.move(873, 350)
         download.clicked.connect(self.singleQRCodeDownload)
+        # 图片尺寸滑条
+        pictureSize = QSlider(Qt.Horizontal, self.singleWidget)
+        pictureSize.setFocusPolicy(Qt.NoFocus)
+        pictureSize.setMinimum(50)
+        pictureSize.setMaximum(800)
+        pictureSize.setValue(self.pictureSizeValue)
+        pictureSize.setGeometry(670, 400, 245, 20)
+        pictureSize.valueChanged[int].connect(self.singleQRCodePictureSizeSliderChanged)
+        # 滑条数值显示
+        self.pictureSizeLabel = QLabel('{}px'.format(self.pictureSizeValue), self.singleWidget)
+        self.pictureSizeLabel.resize(40, 20)
+        self.pictureSizeLabel.move(930, 400)
 
         self.setCentralWidget(self.singleWidget)  # 将其放在 主窗口中间
+
+    """
+    单个二维码生成图片大小滑条滚动
+    """
+    def singleQRCodePictureSizeSliderChanged(self, value):
+        print('---singleQRCodePictureSizeSliderChanged---')
+        self.pictureSizeValue = value
+        self.pictureSizeLabel.setText('{}px'.format(self.pictureSizeValue))
 
     """
     单个二维码生成
@@ -208,7 +230,6 @@ class GUIClient(QMainWindow):
         print(img)
         if img:
             img = img.resize((280, 280))
-            print(img)
             # 将图片缓存起来
             img.save(self.config.get('single_qrcode_cache_key'))
             # 展示在预览区
@@ -229,10 +250,11 @@ class GUIClient(QMainWindow):
     """
     def batchPageRender(self):
         print('---batchPageRender---')
-        # if not self.batchWidget:
+        # if not self.batchWidget:  # 重新使用setCentralWidget 之后会导致之前的Widget 被 QMainWindow 删除, 所以需要每次都重新生成新的Widget 然后再赋值
         self.batchWidget = QWidget()
         temp = QLabel('批量页面', self.batchWidget)
 
+        print(self.batchWidget)
         self.setCentralWidget(self.batchWidget)
 
     """
