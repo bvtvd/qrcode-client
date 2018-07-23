@@ -9,10 +9,11 @@
 """
 
 import sys
-from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QApplication, QAction, QHBoxLayout, QVBoxLayout, QTextEdit, QPushButton, QWidget, QLabel, QFrame, QGridLayout, QMessageBox
+from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QApplication, QAction, QHBoxLayout, QVBoxLayout, QTextEdit, QPushButton, QWidget, QLabel, QFrame, QGridLayout, QMessageBox, QFileDialog
 from PyQt5.QtGui import QIcon, QPixmap, QPicture, QImage
 from utils.QRCode import QRCode
 from PIL import Image
+
 
 class GUIClient(QMainWindow):
 
@@ -30,6 +31,8 @@ class GUIClient(QMainWindow):
     singleWidget = None
     # 单个二维码预览空间
     previewSquare = None
+    # 批量二维码生成页面
+    batchWidget = None
 
     """
     **kwargs:
@@ -52,6 +55,7 @@ class GUIClient(QMainWindow):
     window_title:   窗口标题
     window_icon:    窗口Icon
     spot_icon:  菜单选中点图标
+    single_qrcode_cache_key: 单个二维码缓存路径
     """
     def initConfig(self, **kwargs):
         print('---initConfig---')
@@ -61,6 +65,7 @@ class GUIClient(QMainWindow):
         self.config['window_icon'] = kwargs.get('window_icon', '../images/icon-qrcode.png')
         self.config['spot_icon'] = QIcon(kwargs.get('spot_icon', '../images/spot.png'))
         self.config['none_icon'] = QIcon('')
+        self.config['single_qrcode_cache_key'] = kwargs.get('single_qrcode_cache_key', '../storage/single_qrcode_cache.png')
 
     """
     项目初始化
@@ -149,34 +154,39 @@ class GUIClient(QMainWindow):
     """
     def singlePageRender(self):
         print('---singlePageRender---')
+        # if not self.singleWidget:
         self.singleWidget = QWidget()    # 实例化一个QWidget对象
-        self.singleWidget.resize(100, 100)
-        self.setCentralWidget(self.singleWidget) # 将其放在 主窗口中间
 
         # 还是使用绝对定位好
         self.singleQRCodeTextEdit = QTextEdit(self.singleWidget)
-        self.singleQRCodeTextEdit.setFontPointSize(16)
-        self.singleQRCodeTextEdit.resize(350, 200)
+        self.singleQRCodeTextEdit.setFontPointSize(14)
+        self.singleQRCodeTextEdit.resize(570, 280) #(350, 200)
         self.singleQRCodeTextEdit.move(50, 50)
         createButton = QPushButton('生成二维码', self.singleWidget)
         createButton.resize(120, 35)
-        createButton.move(281, 270)
-        createButton.clicked.connect(self.singleQRCodeCreate)
+        createButton.move(501, 350)
+        createButton.clicked.connect(self.singleQRCodePreview)
 
 
         preview = QLabel('预览: ', self.singleWidget)  # 预览字符
-        preview.move(450, 25)
+        preview.move(670, 25)
         preview.resize(100, 20)
         self.previewSquare = QLabel(self.singleWidget)  # 二维码生成显示区域
-        self.previewSquare.resize(200, 200)
+        self.previewSquare.resize(280, 280)
         self.previewSquare.setStyleSheet("QWidget { background-color: white }")
-        self.previewSquare.move(450, 50)
-        logo = QPushButton('贴图', self.singleWidget)
+        self.previewSquare.move(670, 50)
+        logo = QPushButton('logo', self.singleWidget)
         logo.resize(80, 35)
-        logo.move(450, 270)
+        logo.move(670, 350)
         style = QPushButton('样式', self.singleWidget)
         style.resize(80, 35)
-        style.move(570, 270)
+        style.move(770, 350)
+        download = QPushButton('下载', self.singleWidget)
+        download.resize(80, 35)
+        download.move(873, 350)
+        download.clicked.connect(self.singleQRCodeDownload)
+
+        self.setCentralWidget(self.singleWidget)  # 将其放在 主窗口中间
 
     """
     单个二维码生成
@@ -187,20 +197,43 @@ class GUIClient(QMainWindow):
         if content:
             # 生成二维码图像
             QRTool = QRCode()
-            # img = QRTool.Usage(content)
-            img = Image.open('./utils/halftone-color.png')
+            return QRTool.make(content)
+
+    """
+    单个二维码预览
+    """
+    def singleQRCodePreview(self):
+        print('---singleQRCodePreview---')
+        img = self.singleQRCodeCreate()
+        print(img)
+        if img:
+            img = img.resize((280, 280))
+            print(img)
+            # 将图片缓存起来
+            img.save(self.config.get('single_qrcode_cache_key'))
             # 展示在预览区
-            pixmap = QPixmap.fromImage(QImage.fromData(img))
-            self.previewSquare.setPicture(pixmap)
-        else:
-            QMessageBox.warning(self, '  ', '请输入需要生成二维码的内容')
+            pixmap = QPixmap(self.config.get('single_qrcode_cache_key'))
+            self.previewSquare.setPixmap(pixmap)
+
+    """
+    单个二维码下载
+    """
+    def singleQRCodeDownload(self):
+        print('---singleQRCodeDownload---')
+        fname = QFileDialog.getSaveFileName(self, '保存', 'QRCode', "*.png;;*.jpg;;*.jpeg;;*.gif;;*.bmp")
+        img = self.singleQRCodeCreate()
+        fname[0] and img and img.save(fname[0])
 
     """
     渲染批量生成二维码界面
     """
     def batchPageRender(self):
         print('---batchPageRender---')
-        pass
+        # if not self.batchWidget:
+        self.batchWidget = QWidget()
+        temp = QLabel('批量页面', self.batchWidget)
+
+        self.setCentralWidget(self.batchWidget)
 
     """
     窗口居中

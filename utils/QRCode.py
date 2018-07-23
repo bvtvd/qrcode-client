@@ -54,14 +54,14 @@ class QRCode:
     具体在研究接口
     https://github.com/7sDream/pyqart/blob/master/README.zh.md
     """
-    def HalftoneColorful(self):
+    def HalftoneColorful(self, content = ''):
         QR_VERSION = 10
         POINT_PIXEL = 3
-        painter = QrPainter('你好啊', QR_VERSION)
+        painter = QrPainter(content, QR_VERSION)
         # Halftone colorful
-        img = QrHalftonePrinter.print(painter, img='e.jpg',point_width=POINT_PIXEL)
+        # img = QrHalftonePrinter.print(painter, img='e.jpg',point_width=POINT_PIXEL)
         # normal
-        # img = QrImagePrinter.print(painter, point_width=POINT_PIXEL)
+        img = QrImagePrinter.print(painter, point_width=12, border_width=50)
         return img
 
 
@@ -80,18 +80,18 @@ class QRCode:
         qr = qrcode.QRCode(
             version=1,
             error_correction=error_correction,
-            box_size=7,
-            border=0,
+            box_size=12,
+            border=3,
         )
         qr.add_data(content)
         qr.make(fit=True)
+        # qr.make()
         img = qr.make_image()
         return img
-        return img.resize((size, size))
 
 
 if __name__ == '__main__':
     tool = QRCode()
-    tool.make('这就是你的不对了', 800).show()
-    # img = tool.HalftoneColorful()
-    # img.show()
+    # tool.make('这就是你的不对了', 800).show()
+    img = tool.HalftoneColorful('1')
+    img.show()
