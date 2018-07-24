@@ -36,6 +36,8 @@ class GUIClient(QMainWindow):
     batchWidget = None
     # 单个二维码生成滑条数值
     pictureSizeValue = 280
+    # 单个二维码生成容错率滑条数值
+    errorCorrectionValue = 30
 
     """
     **kwargs:
@@ -188,19 +190,52 @@ class GUIClient(QMainWindow):
         download.move(873, 350)
         download.clicked.connect(self.singleQRCodeDownload)
         # 图片尺寸滑条
+        pictureSizeTitle = QLabel('尺寸: ', self.singleWidget)
+        pictureSizeTitle.resize(40, 20)
+        pictureSizeTitle.move(670, 400)
         pictureSize = QSlider(Qt.Horizontal, self.singleWidget)
         pictureSize.setFocusPolicy(Qt.NoFocus)
         pictureSize.setMinimum(50)
         pictureSize.setMaximum(800)
         pictureSize.setValue(self.pictureSizeValue)
-        pictureSize.setGeometry(670, 400, 245, 20)
+        pictureSize.setGeometry(710, 400, 205, 20)
         pictureSize.valueChanged[int].connect(self.singleQRCodePictureSizeSliderChanged)
         # 滑条数值显示
         self.pictureSizeLabel = QLabel('{}px'.format(self.pictureSizeValue), self.singleWidget)
         self.pictureSizeLabel.resize(40, 20)
         self.pictureSizeLabel.move(930, 400)
+        # 容错率滑条
+        errorCorrectionTitle = QLabel('容错: ', self.singleWidget)
+        errorCorrectionTitle.resize(40, 20)
+        errorCorrectionTitle.move(670, 430)
+        self.errorCorrection = QSlider(Qt.Horizontal, self.singleWidget)
+        self.errorCorrection.setFocusPolicy(Qt.NoFocus)
+        self.errorCorrection.setMinimum(7)
+        self.errorCorrection.setMaximum(30)
+        self.errorCorrection.setValue(self.errorCorrectionValue)
+        self.errorCorrection.setGeometry(710, 430, 205, 20)
+        self.errorCorrection.valueChanged[int].connect(self.singleQRCodeErrorCorrectionSliderChanged)
+        self.errorCorrectionLabel = QLabel('{}%'.format(self.errorCorrectionValue), self.singleWidget)
+        self.errorCorrectionLabel.resize(40, 20)
+        self.errorCorrectionLabel.move(930, 430)
 
         self.setCentralWidget(self.singleWidget)  # 将其放在 主窗口中间
+
+    """
+    单个二维码生成容错率滑条滚动    
+    """
+    def singleQRCodeErrorCorrectionSliderChanged(self, value):
+        if value < 13:
+            self.errorCorrectionValue = 7
+        elif value >= 13 and value < 21:
+            self.errorCorrectionValue = 15
+        elif value >= 21 and value < 27:
+            self.errorCorrectionValue = 25
+        elif value >=27:
+            self.errorCorrectionValue = 30
+
+        self.errorCorrection.setValue(self.errorCorrectionValue)
+        self.errorCorrectionLabel.setText('{}%'.format(self.errorCorrectionValue))
 
     """
     单个二维码生成图片大小滑条滚动
