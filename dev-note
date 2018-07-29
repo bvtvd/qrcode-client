@@ -1,0 +1,16 @@
+使用库:
+qrcode
+pip install pyqart
+Pillow
+
+
+生成二维码大小: 50px -- 800px
+border 占整个图片大小的 16%
+
+内容框  570 * 280
+
+预览框  280 * 280
+
+logo:
+    1. 提供一些常用 logo 以供选择
+    2. 可以自己上传logo (选择本地logo还是上传之后作为一个选项?)
