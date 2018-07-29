@@ -10,6 +10,7 @@
 
 import qrcode
 from pyqart import QArtist, QrHalftonePrinter, QrImagePrinter, QrPainter
+from PIL import Image, ImageDraw
 
 """
 QR Code Class
@@ -76,7 +77,7 @@ class QRCode:
         ERROR_CORRECT_Q = 3
         ERROR_CORRECT_H = 2
     """
-    def make(self, content, size = 200, error_correction = 2):
+    def make(self, content, logo = None, size = 200, error_correction = 2):
         qr = qrcode.QRCode(
             version=1,
             error_correction=error_correction,
@@ -87,7 +88,55 @@ class QRCode:
         qr.make(fit=True)
         # qr.make()
         img = qr.make_image()
+        img = self.pasteLogo(img, logo)
         return img
+
+    """
+    给二维码贴logo
+    """
+    def pasteLogo(self, image, logo):
+        if logo:
+            image = image.convert('RGBA')
+
+            # 获取二维码宽高
+            imgWidth, imgHeight = image.size
+            factor = 4
+            sizeWidth = int(imgWidth/factor)
+            sizeHeight = int(imgHeight/factor)
+
+            # 打开logo
+            logo = Image.open(logo)
+            logo = self.circleBorderImage(logo)
+            logoWidth, logoHeight = logo.size
+            if logoWidth > sizeWidth: logoWidth = sizeWidth
+            if logoHeight > sizeHeight: logoHeight = sizeHeight
+            # logo大小重置
+            logo = logo.resize((logoWidth, logoHeight), Image.ANTIALIAS)
+            x = int((imgWidth - logoWidth)/2)
+            y = int((imgHeight - logoHeight)/2)
+            image.paste(logo, (x, y))
+
+        return image
+
+    """
+    给图片加圆角
+    rad: 半径
+    """
+    def circleBorderImage(self, logo = None, rad = 10):
+        if logo:
+            im = logo.convert('RGBA')
+            # im = logo
+            circle = Image.new('L', (rad * 2, rad * 2), 0)
+            draw = ImageDraw.Draw(circle)
+            draw.ellipse((0, 0, rad * 2, rad * 2), fill=255)
+            alpha = Image.new('L', im.size, 255)
+            w, h = im.size
+            alpha.paste(circle.crop((0, 0, rad, rad)), (0, 0))
+            alpha.paste(circle.crop((0, rad, rad, rad * 2)), (0, h - rad))
+            alpha.paste(circle.crop((rad, 0, rad * 2, rad)), (w - rad, 0))
+            alpha.paste(circle.crop((rad, rad, rad * 2, rad * 2)), (w - rad, h - rad))
+            im.putalpha(alpha)
+            return im
 
 
 if __name__ == '__main__':

@@ -19,7 +19,8 @@ if __name__ == '__main__':
         'window_title': '二维码生成器',
         'window_icon': './images/icon-qrcode.png',
         'spot_icon': './images/spot.png',
-        'single_qrcode_cache_key': './storage/single_qrcode_cache.png'
+        'single_qrcode_cache_key': './storage/single_qrcode_cache.png',
+        'logo_dir': './images/logos'
     }
 
     app = QApplication(sys.argv)

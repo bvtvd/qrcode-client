@@ -11,9 +11,12 @@
 import sys
 from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QApplication, QAction, QHBoxLayout, QVBoxLayout, QTextEdit, QPushButton, QWidget, QLabel, QFrame, QGridLayout, QMessageBox, QFileDialog, QSlider
 from PyQt5.QtGui import QIcon, QPixmap, QPicture, QImage
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSlot
 from utils.QRCode import QRCode
+from utils.LogoDialog import LogoDialog
 from PIL import Image
+import time, random
+from utils.Helper import center
 
 
 class GUIClient(QMainWindow):
@@ -38,6 +41,8 @@ class GUIClient(QMainWindow):
     pictureSizeValue = 280
     # 单个二维码生成容错率滑条数值
     errorCorrectionValue = 30
+    # logo 路径
+    logoPath = None
 
     """
     **kwargs:
@@ -71,6 +76,7 @@ class GUIClient(QMainWindow):
         self.config['spot_icon'] = QIcon(kwargs.get('spot_icon', '../images/spot.png'))
         self.config['none_icon'] = QIcon('')
         self.config['single_qrcode_cache_key'] = kwargs.get('single_qrcode_cache_key', '../storage/single_qrcode_cache.png')
+        self.config['logo_dir'] = kwargs.get('logo_dir', './images/logos')
 
     """
     项目初始化
@@ -182,6 +188,7 @@ class GUIClient(QMainWindow):
         logo = QPushButton('logo', self.singleWidget)
         logo.resize(80, 35)
         logo.move(670, 350)
+        logo.clicked.connect(self.chooseLogo)
         style = QPushButton('样式', self.singleWidget)
         style.resize(80, 35)
         style.move(770, 350)
@@ -222,9 +229,29 @@ class GUIClient(QMainWindow):
         self.setCentralWidget(self.singleWidget)  # 将其放在 主窗口中间
 
     """
+    选择logo
+    """
+    def chooseLogo(self):
+        print('---chooseLogo---')
+        dialog = LogoDialog(self, logoDir=self.config['logo_dir'])
+        dialog.logoChosenSignal.connect(self.logoChosen)    # 绑定自定义事件
+        if dialog.exec_():
+            pass
+
+
+    """
+    logo 被选中
+    """
+    def logoChosen(self, s):
+        print('---GUIClient.logoChosen---')
+        self.logoPath = s
+        self.singleQRCodePreview()  # 生成预览二维码
+
+    """
     单个二维码生成容错率滑条滚动    
     """
     def singleQRCodeErrorCorrectionSliderChanged(self, value):
+        print('---singleQRCodeErrorCorrectionSliderChanged---')
         if value < 13:
             self.errorCorrectionValue = 7
         elif value >= 13 and value < 21:
@@ -254,7 +281,7 @@ class GUIClient(QMainWindow):
         if content:
             # 生成二维码图像
             QRTool = QRCode()
-            return QRTool.make(content)
+            return QRTool.make(content, self.logoPath)
 
     """
     单个二维码预览
@@ -262,7 +289,6 @@ class GUIClient(QMainWindow):
     def singleQRCodePreview(self):
         print('---singleQRCodePreview---')
         img = self.singleQRCodeCreate()
-        print(img)
         if img:
             img = img.resize((280, 280))
             # 将图片缓存起来
@@ -276,9 +302,11 @@ class GUIClient(QMainWindow):
     """
     def singleQRCodeDownload(self):
         print('---singleQRCodeDownload---')
-        fname = QFileDialog.getSaveFileName(self, '保存', 'QRCode', "*.png;;*.jpg;;*.jpeg;;*.gif;;*.bmp")
         img = self.singleQRCodeCreate()
-        fname[0] and img and img.save(fname[0])
+        if img:
+            imgName = time.strftime('%Y%m%d%H%M%S',time.localtime(time.time())) + str(random.randint(1000, 9999))
+            fname = QFileDialog.getSaveFileName(self, '保存', imgName, "*.png;;*.jpg;;*.jpeg;;*.gif;;*.bmp")
+            fname[0] and img.save(fname[0])
 
     """
     渲染批量生成二维码界面
@@ -297,10 +325,11 @@ class GUIClient(QMainWindow):
     """
     def center(self):
         print('---center---')
-        qr = self.frameGeometry()   # 得到主窗口大小
-        cp = QDesktopWidget().availableGeometry().center()  # 获取显示器分辨率, 得到中间点位置
-        qr.moveCenter(cp)   # 将窗口中心点放置到qr的中心点
-        self.move(qr.topLeft()) # 把窗口左上角的坐标设置为矩形左上角的坐标
+        # qr = self.frameGeometry()   # 得到主窗口大小
+        # cp = QDesktopWidget().availableGeometry().center()  # 获取显示器分辨率, 得到中间点位置
+        # qr.moveCenter(cp)   # 将窗口中心点放置到qr的中心点
+        # self.move(qr.topLeft()) # 把窗口左上角的坐标设置为矩形左上角的坐标
+        center(self)
 
 
 if __name__ == '__main__':
