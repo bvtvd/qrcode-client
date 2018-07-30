@@ -8,9 +8,9 @@
 @Desc    :
 '''
 
-from PyQt5.QtWidgets import QDialog, QListWidget, QListView, QListWidgetItem, QPushButton, QFileDialog, QMessageBox
-from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QSize, pyqtSignal, Qt
+from PyQt5.QtWidgets import QDialog, QListWidget, QListView, QListWidgetItem, QPushButton, QFileDialog, QMessageBox, QMenu
+from PyQt5.QtGui import QIcon, QCursor
+from PyQt5.QtCore import QSize, pyqtSignal, Qt, QPoint
 from utils.Helper import center
 import os
 import shutil
@@ -38,10 +38,12 @@ class LogoDialog(QDialog):
         self.logoList.setMovement(QListView.Static)
         self.logoList.setIconSize(QSize(50, 50))
         self.logoList.setSpacing(12)
-
         self.readLogos()
 
         # self.logoList.currentItemChanged.connect(self.logoChosen)
+        # 添加右键菜单
+        self.logoList.setContextMenuPolicy(3)
+        self.logoList.customContextMenuRequested[QPoint].connect(self.mouseMenu)
 
         # 上传按钮
         self.uploadButton = QPushButton('上传', self)
@@ -68,6 +70,30 @@ class LogoDialog(QDialog):
         self.setWindowTitle('选择logo')
         self.setFixedSize(600, 400)
         self.center()
+
+    """
+    右键菜单
+    """
+    def mouseMenu(self, point):
+        print('---mouseMenu---')
+        print(point)
+        item = self.logoList.itemAt(point)
+        print(item)
+        if item:
+            print(self.logoList.currentRow())
+            menu = QMenu(self)
+            deleteAction = menu.addAction('删除')
+            action = menu.exec_(QCursor.pos())
+            print(action)
+            if action == deleteAction:
+                print('删除了')
+                self.deleteLogo(self.logoList.currentRow())
+
+    """
+    删除logo 文件
+    """
+    def deleteLogo(self, index):
+        pass
 
     """
     清除logo, 不使用logo
