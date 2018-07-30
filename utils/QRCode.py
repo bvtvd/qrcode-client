@@ -106,12 +106,10 @@ class QRCode:
 
             # 打开logo
             logo = Image.open(logo)
-            logo = self.circleBorderImage(logo)
-            logoWidth, logoHeight = logo.size
-            if logoWidth > sizeWidth: logoWidth = sizeWidth
-            if logoHeight > sizeHeight: logoHeight = sizeHeight
+            # logo = self.circleBorderImage(logo)   # 给 logo 加圆角
             # logo大小重置
-            logo = logo.resize((logoWidth, logoHeight), Image.ANTIALIAS)
+            logo = logo.resize((sizeWidth, sizeHeight), Image.ANTIALIAS)
+            logoWidth, logoHeight = logo.size
             x = int((imgWidth - logoWidth)/2)
             y = int((imgHeight - logoHeight)/2)
             image.paste(logo, (x, y))
