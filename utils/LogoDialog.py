@@ -73,27 +73,29 @@ class LogoDialog(QDialog):
 
     """
     右键菜单
+    右键删除logo
     """
     def mouseMenu(self, point):
         print('---mouseMenu---')
-        print(point)
         item = self.logoList.itemAt(point)
-        print(item)
         if item:
-            print(self.logoList.currentRow())
-            menu = QMenu(self)
-            deleteAction = menu.addAction('删除')
-            action = menu.exec_(QCursor.pos())
-            print(action)
+            menu = QMenu(self)  # 添加菜单
+            deleteAction = menu.addAction('删除')     # 添加菜单选项
+            action = menu.exec_(QCursor.pos())  # 执行菜操作
             if action == deleteAction:
-                print('删除了')
                 self.deleteLogo(self.logoList.currentRow())
 
     """
     删除logo 文件
     """
     def deleteLogo(self, index):
-        pass
+        print('---deleteLogo---')
+        file_path = self.logoPathList[index]
+        if file_path:
+            # 删除文件
+            os.remove(file_path)
+            # 重新读取 logo 列表
+            self.readLogos()
 
     """
     清除logo, 不使用logo
