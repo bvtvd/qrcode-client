@@ -17,6 +17,9 @@ QR Code Class
 """
 class QRCode:
 
+    QR_VERSION = 10
+    POINT_PIXEL = 3
+
     def __init__(self):
         pass
 
@@ -136,9 +139,80 @@ class QRCode:
             im.putalpha(alpha)
             return im
 
+    """
+    获取 artist
+    """
+    def getArtist(self, content, background_image, only_data = False):
+        return QArtist(content, background_image, self.QR_VERSION, only_data=only_data)
+
+    """
+    获取 painter
+    """
+    def getPainter(self, content):
+        return QrPainter(content, self.QR_VERSION)
+
+    """
+    Halftone
+    @ return: Image
+    """
+    def halftone(self, content, background_image):
+        painter = self.getPainter(content)
+        return QrHalftonePrinter.print(painter, img = background_image, point_width=self.POINT_PIXEL, colorful=False)
+
+    """
+    Halftone colorful
+    @ return : Image
+    """
+    def halftoneColorful(self, content, background_image):
+        painter = self.getPainter(content)
+        return QrHalftonePrinter.print(painter, img=background_image, point_width=self.POINT_PIXEL)
+
+    """
+    Halftone pixel
+    @ return : Image
+    """
+    def halftonePixel(self, content, background_image):
+        painter = self.getPainter(content)
+        return QrHalftonePrinter.print(painter, img=background_image, point_width=self.POINT_PIXEL, colorful=False, pixelization=True)
+
+    """
+    Qart
+    @return : Image
+    """
+    def qart(self, content, background_image):
+        artist = self.getArtist(content, background_image)
+        return QrImagePrinter.print(artist, point_width=self.POINT_PIXEL)
+
+    """
+    Qart data only
+    @ return : Image
+    """
+    def qartDataOnly(self, content, background_image):
+        artist = self.getArtist(content, background_image, True)
+        return QrImagePrinter.print(artist, point_width=self.POINT_PIXEL)
+
+    """
+    halfArt
+    @ return : Image
+    """
+    def halfArt(self, content, background_image):
+        artist = self.getArtist(content, background_image)
+        return QrHalftonePrinter.print(artist, point_width=self.POINT_PIXEL)
+
+    """
+    halfArt data only
+    @return : Image
+    """
+    def halfArtDataOnly(self, content, background_image):
+        artist = self.getArtist(content, background_image, True)
+        return QrHalftonePrinter.print(artist, point_width=self.POINT_PIXEL)
+
 
 if __name__ == '__main__':
     tool = QRCode()
     # tool.make('这就是你的不对了', 800).show()
-    img = tool.HalftoneColorful('1')
-    img.show()
+    # img = tool.HalftoneColorful('1')
+    # img = tool.halftone('你好啊, nana', '../images/nana.jpg')
+    # img = tool.halftoneColorful('你好啊, nana', '../images/nana.jpg')
+    img = tool.halftonePixel('你好啊, nana', '../images/nana.jpg')
+    print(img.size) # (177, 177)
