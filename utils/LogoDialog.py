@@ -5,7 +5,7 @@
 @Contact :   hans01@foxmail.com
 @File    :   LogoDialog.py
 @Time    :   2018/7/28 11:21
-@Desc    :
+@Desc    :   logo 弹窗
 '''
 
 from PyQt5.QtWidgets import QDialog, QListWidget, QListView, QListWidgetItem, QPushButton, QFileDialog, QMessageBox, QMenu

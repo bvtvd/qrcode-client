@@ -85,7 +85,7 @@ class QRCode:
             version=1,
             error_correction=error_correction,
             box_size=12,
-            border=3,
+            border=0,
         )
         qr.add_data(content)
         qr.make(fit=True)
@@ -219,32 +219,32 @@ if __name__ == '__main__':
     # img = tool.halftonePixel('你好啊, nana', '../images/nana.jpg')
     # normal
     img = tool.make(content)
-    img.save('../images/styles/normal.jpg')
+    img.resize((150, 150)).save('../images/styles/0_normal.jpg')
 
     # halftone
     img = tool.halftone(content, background_image)
-    img.save('../images/styles/halftone.jpg')
+    img.resize((150, 150)).save('../images/styles/1_halftone.jpg')
 
     # halftone colorful
     img = tool.halftoneColorful(content, background_image)
-    img.save('../images/styles/halftone_colorful.jpg')
+    img.resize((150, 150)).save('../images/styles/2_halftoneColorful.jpg')
 
     # halftone pixel
     img = tool.halftonePixel(content, background_image)
-    img.save('../images/styles/halftone_pixel.jpg')
+    img.resize((150, 150)).save('../images/styles/3_halftonePixel.jpg')
 
     # qart
     img = tool.qart(content, background_image)
-    img.save('../images/styles/qart.jpg')
+    img.resize((150, 150)).save('../images/styles/4_qart.jpg')
 
     # qart data only
     img = tool.qartDataOnly(content, background_image)
-    img.save('../images/styles/qart_data_only.jpg')
+    img.resize((150, 150)).save('../images/styles/5_qartDataOnly.jpg')
 
     # halfArt
     img = tool.halfArt(content, background_image)
-    img.save('../images/styles/half_art.jpg')
+    img.resize((150, 150)).save('../images/styles/6_halfArt.jpg')
 
     # halfArt data only
     img = tool.halfArtDataOnly(content, background_image)
-    img.save('../images/styles/half_art_data_only.jpg')
+    img.resize((150, 150)).save('../images/styles/7_halfArtDataOnly.jpg')

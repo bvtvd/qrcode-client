@@ -14,6 +14,7 @@ from PyQt5.QtGui import QIcon, QPixmap, QPicture, QImage
 from PyQt5.QtCore import Qt, pyqtSlot
 from utils.QRCode import QRCode
 from utils.LogoDialog import LogoDialog
+from utils.StyleDialog import StyleDialog
 from PIL import Image
 import time, random
 from utils.Helper import center
@@ -43,6 +44,8 @@ class GUIClient(QMainWindow):
     errorCorrectionValue = 30
     # logo 路径
     logoPath = None
+    # 二维码样式
+    style = 'normal'
 
     """
     **kwargs:
@@ -77,6 +80,7 @@ class GUIClient(QMainWindow):
         self.config['none_icon'] = QIcon('')
         self.config['single_qrcode_cache_key'] = kwargs.get('single_qrcode_cache_key', '../storage/single_qrcode_cache.png')
         self.config['logo_dir'] = kwargs.get('logo_dir', './images/logos')
+        self.config['style_dir'] = kwargs.get('style_dir', './images/styles')
 
     """
     项目初始化
@@ -192,6 +196,7 @@ class GUIClient(QMainWindow):
         style = QPushButton('样式', self.singleWidget)
         style.resize(80, 35)
         style.move(770, 350)
+        style.clicked.connect(self.chooseStyle)
         download = QPushButton('下载', self.singleWidget)
         download.resize(80, 35)
         download.move(873, 350)
@@ -226,7 +231,27 @@ class GUIClient(QMainWindow):
         self.errorCorrectionLabel.resize(40, 20)
         self.errorCorrectionLabel.move(930, 430)
 
+        # self.singleWidget.setStyleSheet('QWidget { background-color: black }')
         self.setCentralWidget(self.singleWidget)  # 将其放在 主窗口中间
+
+
+    """
+    选择样式
+    """
+    def chooseStyle(self):
+        print("---chooseStyle---")
+        dialog = StyleDialog(self, styleDir=self.config['style_dir'])
+        dialog.styleChosenSignal.connect(self.styleChosen)
+        if dialog.exec_():
+            pass
+
+    """
+    样式被选中
+    """
+    def styleChosen(self, style):
+        print('---styleChosen---')
+        self.style = style
+        self.singleQRCodePreview() # 生成预览二维码
 
     """
     选择logo

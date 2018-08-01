@@ -20,7 +20,8 @@ if __name__ == '__main__':
         'window_icon': './images/icon-qrcode.png',
         'spot_icon': './images/spot.png',
         'single_qrcode_cache_key': './storage/single_qrcode_cache.png',
-        'logo_dir': './images/logos'
+        'logo_dir': './images/logos',
+        'style_dir': './images/styles'
     }
 
     app = QApplication(sys.argv)
