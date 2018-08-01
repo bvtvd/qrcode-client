@@ -209,10 +209,42 @@ class QRCode:
 
 
 if __name__ == '__main__':
+    content = 'https://www.jianshu.com/u/ef64b2653e5e'
+    background_image = '../images/nana.jpg'
     tool = QRCode()
     # tool.make('这就是你的不对了', 800).show()
     # img = tool.HalftoneColorful('1')
     # img = tool.halftone('你好啊, nana', '../images/nana.jpg')
     # img = tool.halftoneColorful('你好啊, nana', '../images/nana.jpg')
-    img = tool.halftonePixel('你好啊, nana', '../images/nana.jpg')
-    print(img.size) # (177, 177)
+    # img = tool.halftonePixel('你好啊, nana', '../images/nana.jpg')
+    # normal
+    img = tool.make(content)
+    img.save('../images/styles/normal.jpg')
+
+    # halftone
+    img = tool.halftone(content, background_image)
+    img.save('../images/styles/halftone.jpg')
+
+    # halftone colorful
+    img = tool.halftoneColorful(content, background_image)
+    img.save('../images/styles/halftone_colorful.jpg')
+
+    # halftone pixel
+    img = tool.halftonePixel(content, background_image)
+    img.save('../images/styles/halftone_pixel.jpg')
+
+    # qart
+    img = tool.qart(content, background_image)
+    img.save('../images/styles/qart.jpg')
+
+    # qart data only
+    img = tool.qartDataOnly(content, background_image)
+    img.save('../images/styles/qart_data_only.jpg')
+
+    # halfArt
+    img = tool.halfArt(content, background_image)
+    img.save('../images/styles/half_art.jpg')
+
+    # halfArt data only
+    img = tool.halfArtDataOnly(content, background_image)
+    img.save('../images/styles/half_art_data_only.jpg')
