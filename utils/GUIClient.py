@@ -305,8 +305,9 @@ class GUIClient(QMainWindow):
         content = self.singleQRCodeTextEdit.toPlainText()   # 获取出入内容
         if content:
             # 生成二维码图像
+            # errorCorrectionValue 还要转化一次
             QRTool = QRCode()
-            return QRTool.make(content, self.logoPath)
+            return QRTool.make(content, self.logoPath, self.style)
 
     """
     单个二维码预览
