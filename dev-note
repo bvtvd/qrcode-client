@@ -2,6 +2,7 @@
 qrcode
 pip install pyqart
 Pillow
+pip install openpyxl
 
 
 生成二维码大小: 50px -- 800px

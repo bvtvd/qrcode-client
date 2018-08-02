@@ -17,6 +17,7 @@ from utils.LogoDialog import LogoDialog
 from utils.StyleDialog import StyleDialog
 from PIL import Image
 from utils.Helper import center, getDesktopPath
+from openpyxl import load_workbook
 
 
 class GUIClient(QMainWindow):
@@ -432,8 +433,30 @@ class GUIClient(QMainWindow):
     def batchQRCodeCreate(self):
         print('---batchQRCodeCreate---')
         if self.batchFile:
-            # 需要读取excel
-            pass
+            excel = load_workbook(self.batchFile)
+            sheetnames = excel.sheetnames
+            print(sheetnames)
+            sheet = excel[sheetnames[0]]
+            print(sheet)
+            # 整合表数据
+            # 数据格式 [ {}, {}, {} ]
+            print(sheet.max_column)
+            print(sheet.max_row)
+            # print(sheet.cell(row=1, column=1).value)
+            data = []
+            for i in range(2, sheet.max_row + 1):
+                item = []
+                for j in range(1, sheet.max_column + 1):
+                    item.append(sheet.cell(row=i,column=j).value)
+                data.append(item)
+
+            # 文件夹不存在的话需要新建一个文件夹
+            savePath = os.path.join(getDesktopPath(), 'pics')
+            QRTool = QRCode()
+            for vo in data:
+                img = QRTool.make(vo[0])
+                img.save(os.path.join(savePath, vo[0] + '.png'))
+
         else:
             QMessageBox.warning(self, ' ', '请先上传文件', QMessageBox.Ok)
 
