@@ -45,6 +45,8 @@ class GUIClient(QMainWindow):
     logoPath = None
     # 二维码样式
     style = 'normal'
+    # 批量文件
+    batchFile = None
 
     """
     **kwargs:
@@ -402,6 +404,7 @@ class GUIClient(QMainWindow):
         self.filePathInput.setReadOnly(True)
         self.filePathInput.resize(720, 40)
         self.filePathInput.move(140, 100)
+        self.filePathInput.setStyleSheet('QLineEdit { font-size:14px; }')
 
         # 下载模板按钮
         downloadTemplateButton = QPushButton('下载批量模板', self.batchWidget)
@@ -413,13 +416,35 @@ class GUIClient(QMainWindow):
         uploadTemplateButton = QPushButton('上传', self.batchWidget)
         uploadTemplateButton.resize(200, 35)
         uploadTemplateButton.move(400, 160)
+        uploadTemplateButton.clicked.connect(self.uploadBatchTemplate)
 
         # 生成二维码按钮
         batchCreateButton = QPushButton('生成', self.batchWidget)
         batchCreateButton.resize(200, 35)
         batchCreateButton.move(660, 160)
+        batchCreateButton.clicked.connect(self.batchQRCodeCreate)
 
         self.setCentralWidget(self.batchWidget)
+
+    """
+    批量生成二维码
+    """
+    def batchQRCodeCreate(self):
+        print('---batchQRCodeCreate---')
+        if self.batchFile:
+            # 需要读取excel
+            pass
+        else:
+            QMessageBox.warning(self, ' ', '请先上传文件', QMessageBox.Ok)
+
+    """
+    上传批量模板
+    """
+    def uploadBatchTemplate(self):
+        fname = QFileDialog.getOpenFileName(self, '选择批量模板', getDesktopPath())
+        if fname[0]:
+            self.batchFile = fname[0]
+            self.filePathInput.setText(fname[0])
 
     # 下载批量模板
     def downloadBatchTemplate(self):
