@@ -288,6 +288,7 @@ class GUIClient(QMainWindow):
 
         self.errorCorrection.setValue(self.errorCorrectionValue)
         self.errorCorrectionLabel.setText('{}%'.format(self.errorCorrectionValue))
+        self.singleQRCodePreview()
 
     """
     单个二维码生成图片大小滑条滚动
@@ -306,8 +307,27 @@ class GUIClient(QMainWindow):
         if content:
             # 生成二维码图像
             # errorCorrectionValue 还要转化一次
+            if self.style != 'normal' and not self.logoPath:    # 非普通二维码需要背景图片
+                QMessageBox.warning(self, '  ', '请在 logo 中选择背景图片', QMessageBox.Ok)
+                return
+
             QRTool = QRCode()
-            return QRTool.make(content, self.logoPath, self.style)
+            errorCorrection = self.transferErrorCorrectionValue()
+            print(errorCorrection)
+            return QRTool.make(content, self.logoPath, self.style, errorCorrection)
+
+    """
+    转化容错值
+    """
+    def transferErrorCorrectionValue(self):
+        vdict = {
+            7 : 1,
+            15: 0,
+            25: 3,
+            30: 2
+        }
+        return vdict.get(self.errorCorrectionValue, 30)
+
 
     """
     单个二维码预览
@@ -332,6 +352,8 @@ class GUIClient(QMainWindow):
         if img:
             imgName = time.strftime('%Y%m%d%H%M%S',time.localtime(time.time())) + str(random.randint(1000, 9999))
             fname = QFileDialog.getSaveFileName(self, '保存', imgName, "*.png;;*.jpg;;*.jpeg;;*.gif;;*.bmp")
+            img = img.resize((self.pictureSizeValue, self.pictureSizeValue))
+            print(img.size)
             fname[0] and img.save(fname[0])
 
     """
