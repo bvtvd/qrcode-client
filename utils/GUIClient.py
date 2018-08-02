@@ -18,6 +18,7 @@ from utils.StyleDialog import StyleDialog
 from PIL import Image
 import time, random
 from utils.Helper import center
+import os
 
 
 class GUIClient(QMainWindow):
@@ -81,6 +82,7 @@ class GUIClient(QMainWindow):
         self.config['single_qrcode_cache_key'] = kwargs.get('single_qrcode_cache_key', '../storage/single_qrcode_cache.png')
         self.config['logo_dir'] = kwargs.get('logo_dir', './images/logos')
         self.config['style_dir'] = kwargs.get('style_dir', './images/styles')
+        self.config['images_path'] = kwargs.get('images_path', './images/')
 
     """
     项目初始化
@@ -108,9 +110,12 @@ class GUIClient(QMainWindow):
         menuMenu.addAction(self.single)
         menuMenu.addAction(self.batch)
         menuMenu.addSeparator()
-        menuMenu.addAction('设置')
+        setting = QAction(QIcon(self.getImage('settings.png')), '设置', self)
+        menuMenu.addAction(setting)
         menuMenu.addSeparator()
-        menuMenu.addAction('退出')
+        exit = QAction(QIcon(self.getImage('exit.png')), '退出', self)
+        exit.triggered.connect(self.close)
+        menuMenu.addAction(exit)
 
     """
     设置单个生成菜单
@@ -131,6 +136,12 @@ class GUIClient(QMainWindow):
         self.batch = QAction(icon, '批量生成', self)
         self.batch.setShortcut('Ctrl+B')
         self.batch.triggered.connect(self.chooseGenerateType)
+
+    """
+    获取图片路径
+    """
+    def getImage(self, name):
+        return os.path.join(self.config['images_path'], name)
 
     """
     菜单点击事件
@@ -313,7 +324,6 @@ class GUIClient(QMainWindow):
 
             QRTool = QRCode()
             errorCorrection = self.transferErrorCorrectionValue()
-            print(errorCorrection)
             return QRTool.make(content, self.logoPath, self.style, errorCorrection)
 
     """
@@ -334,6 +344,7 @@ class GUIClient(QMainWindow):
     """
     def singleQRCodePreview(self):
         print('---singleQRCodePreview---')
+        self.previewSuqareLoading()
         img = self.singleQRCodeCreate()
         if img:
             img = img.resize((280, 280))
@@ -344,16 +355,28 @@ class GUIClient(QMainWindow):
             self.previewSquare.setPixmap(pixmap)
 
     """
+    预览框加载动画
+    """
+    def previewSuqareLoading(self):
+        print('---previewSuqareLoading---')
+        # self.previewSquare.setText(' 正在生成... ')
+        # pixmap = QPixmap('./images/loading.png')
+        # self.previewSquare.setPixmap(pixmap)
+        # self.previewSquare.setStyleSheet('QLabel {  }')
+
+    """
     单个二维码下载
     """
     def singleQRCodeDownload(self):
         print('---singleQRCodeDownload---')
+        # self.previewSuqareLoading()
+        # return
+
         img = self.singleQRCodeCreate()
         if img:
             imgName = time.strftime('%Y%m%d%H%M%S',time.localtime(time.time())) + str(random.randint(1000, 9999))
             fname = QFileDialog.getSaveFileName(self, '保存', imgName, "*.png;;*.jpg;;*.jpeg;;*.gif;;*.bmp")
             img = img.resize((self.pictureSizeValue, self.pictureSizeValue))
-            print(img.size)
             fname[0] and img.save(fname[0])
 
     """

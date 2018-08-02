@@ -54,9 +54,9 @@ class StyleDialog(QDialog):
     def styleConfirmed(self):
         print('---styleConfirmed---')
         style = self.stylePathList[self.styleList.currentRow()]
-        print(style)
-        self.styleChosenSignal.emit(style)
         self.close()
+        self.styleChosenSignal.emit(style)
+
 
 
     """
