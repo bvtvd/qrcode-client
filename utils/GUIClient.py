@@ -8,17 +8,15 @@
 @desc: 
 """
 
-import sys
-from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QApplication, QAction, QHBoxLayout, QVBoxLayout, QTextEdit, QPushButton, QWidget, QLabel, QFrame, QGridLayout, QMessageBox, QFileDialog, QSlider
+import sys, time, random, os, shutil
+from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QApplication, QAction, QHBoxLayout, QVBoxLayout, QTextEdit, QPushButton, QWidget, QLabel, QFrame, QGridLayout, QMessageBox, QFileDialog, QSlider, QLineEdit
 from PyQt5.QtGui import QIcon, QPixmap, QPicture, QImage
 from PyQt5.QtCore import Qt, pyqtSlot
 from utils.QRCode import QRCode
 from utils.LogoDialog import LogoDialog
 from utils.StyleDialog import StyleDialog
 from PIL import Image
-import time, random
-from utils.Helper import center
-import os
+from utils.Helper import center, getDesktopPath
 
 
 class GUIClient(QMainWindow):
@@ -80,9 +78,11 @@ class GUIClient(QMainWindow):
         self.config['spot_icon'] = QIcon(kwargs.get('spot_icon', '../images/spot.png'))
         self.config['none_icon'] = QIcon('')
         self.config['single_qrcode_cache_key'] = kwargs.get('single_qrcode_cache_key', '../storage/single_qrcode_cache.png')
-        self.config['logo_dir'] = kwargs.get('logo_dir', './images/logos')
-        self.config['style_dir'] = kwargs.get('style_dir', './images/styles')
-        self.config['images_path'] = kwargs.get('images_path', './images/')
+        self.config['logo_dir'] = kwargs.get('logo_dir', '../images/logos')
+        self.config['style_dir'] = kwargs.get('style_dir', '../images/styles')
+        self.config['images_path'] = kwargs.get('images_path', '../images/')
+        self.config['storage_path'] = kwargs.get('storage_path', '../storage/')
+        self.config['config_path'] = kwargs.get('config_path', '../config/')
 
     """
     项目初始化
@@ -142,6 +142,18 @@ class GUIClient(QMainWindow):
     """
     def getImage(self, name):
         return os.path.join(self.config['images_path'], name)
+
+    """
+    获取 storage 路径
+    """
+    def getStorage(self, name):
+        return os.path.join(self.config['storage_path'], name)
+
+    """
+    获取 config 路径
+    """
+    def getConfig(self, name):
+        return os.path.join(self.config['config_path'], name)
 
     """
     菜单点击事件
@@ -386,10 +398,41 @@ class GUIClient(QMainWindow):
         print('---batchPageRender---')
         # if not self.batchWidget:  # 重新使用setCentralWidget 之后会导致之前的Widget 被 QMainWindow 删除, 所以需要每次都重新生成新的Widget 然后再赋值
         self.batchWidget = QWidget()
-        temp = QLabel('批量页面', self.batchWidget)
+        self.filePathInput = QLineEdit(self.batchWidget)
+        self.filePathInput.setReadOnly(True)
+        self.filePathInput.resize(720, 40)
+        self.filePathInput.move(140, 100)
 
-        print(self.batchWidget)
+        # 下载模板按钮
+        downloadTemplateButton = QPushButton('下载批量模板', self.batchWidget)
+        downloadTemplateButton.resize(200, 35)
+        downloadTemplateButton.move(140, 160)
+        downloadTemplateButton.clicked.connect(self.downloadBatchTemplate)
+
+        # 上传文件按钮
+        uploadTemplateButton = QPushButton('上传', self.batchWidget)
+        uploadTemplateButton.resize(200, 35)
+        uploadTemplateButton.move(400, 160)
+
+        # 生成二维码按钮
+        batchCreateButton = QPushButton('生成', self.batchWidget)
+        batchCreateButton.resize(200, 35)
+        batchCreateButton.move(660, 160)
+
         self.setCentralWidget(self.batchWidget)
+
+    # 下载批量模板
+    def downloadBatchTemplate(self):
+        print('---downloadBatchTemplate---')
+        name = 'template.xlsx'
+        templatePath = self.getStorage(name)
+        if os.path.exists(templatePath):
+            savePath = os.path.join(getDesktopPath(), name)
+            fname = QFileDialog.getSaveFileName(self, '保存',  savePath)
+            fname[0] and shutil.copy(templatePath, fname[0])
+        else:
+            QMessageBox.warning(self, '  ', '批量模板已丢失!', QMessageBox.Ok)
+
 
     """
     窗口居中

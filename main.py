@@ -22,7 +22,9 @@ if __name__ == '__main__':
         'single_qrcode_cache_key': './storage/single_qrcode_cache.png',
         'logo_dir': './images/logos',
         'style_dir': './images/styles',
-        'images_path': './images/'
+        'images_path': './images/',
+        'storage_path': './storage/',
+        'config_path': './config/'
     }
 
     app = QApplication(sys.argv)
