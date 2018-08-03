@@ -48,6 +48,8 @@ class GUIClient(QMainWindow):
     style = 'normal'
     # 批量文件
     batchFile = None
+    # 批量logo 地址
+    batchLogoPath = None
 
     """
     **kwargs:
@@ -425,7 +427,60 @@ class GUIClient(QMainWindow):
         batchCreateButton.move(660, 160)
         batchCreateButton.clicked.connect(self.batchQRCodeCreate)
 
+        # 选择logo 按钮
+        batchLogoButton = QLabel(self.batchWidget)
+        batchLogoButton.resize(50, 35)
+        batchLogoButton.move(140, 215)
+        batchLogoButton.setText('logo: ')
+        batchLogoButton.setStyleSheet('QLabel { font-size: 14px }')
+        batchLogoButton.setToolTip('点我选择logo')
+        batchLogoButton.setCursor(Qt.PointingHandCursor)
+        batchLogoButton.mousePressEvent = self.batchChooseLogo
+
+        # logo 贴图 label
+        self.batchLogoLabel = QLabel(self.batchWidget)
+        self.batchLogoLabel.resize(50, 50)
+        self.batchLogoLabel.move(190, 215)
+        # self.batchLogoLabel.setStyleSheet('QLabel { background-color: white }')
+        self.batchLogoLabel.setCursor(Qt.PointingHandCursor)
+        self.batchLogoLabel.mousePressEvent = self.batchChooseLogo
+
+        # 样式按钮
+        batchStyleButton = QPushButton('样式', self.batchWidget)
+        batchStyleButton.resize(100, 35)
+        batchStyleButton.move(400, 215)
+
+        # 样式内容label
+        batchStyleLabel = QLabel(self.batchWidget)
+        batchStyleLabel.resize(100, 20)
+        batchStyleLabel.move(520, 230)
+        batchStyleLabel.setStyleSheet('QLabel { background-color: white }')
+
         self.setCentralWidget(self.batchWidget)
+
+    """
+    批量页面选择logo
+    """
+    def batchChooseLogo(self, event):
+        print('---batchChooseLogo---')
+        dialog = LogoDialog(self, logoDir=self.config['logo_dir'])
+        dialog.logoChosenSignal.connect(self.batchLogoChosen)  # 绑定自定义事件
+        if dialog.exec_():
+            pass
+
+    """
+    批量logo 选中
+    """
+    def batchLogoChosen(self, s):
+        print('---batchLogoChosen---')
+        print(s)
+        self.batchLogoPath = s
+        if self.batchLogoPath:
+            pixmap = QPixmap(self.batchLogoPath).scaled(50, 50)
+            self.batchLogoLabel.setPixmap(pixmap)
+        else:
+            self.batchLogoLabel.setText(' ')
+
 
     """
     批量生成二维码
