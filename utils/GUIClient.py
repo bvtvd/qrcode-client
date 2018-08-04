@@ -9,7 +9,7 @@
 """
 
 import sys, time, random, os, shutil
-from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QApplication, QAction, QHBoxLayout, QVBoxLayout, QTextEdit, QPushButton, QWidget, QLabel, QFrame, QGridLayout, QMessageBox, QFileDialog, QSlider, QLineEdit
+from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QApplication, QAction, QHBoxLayout, QVBoxLayout, QTextEdit, QPushButton, QWidget, QLabel, QFrame, QGridLayout, QMessageBox, QFileDialog, QSlider, QLineEdit, QProgressBar
 from PyQt5.QtGui import QIcon, QPixmap, QPicture, QImage
 from PyQt5.QtCore import Qt, pyqtSlot
 from utils.QRCode import QRCode
@@ -50,6 +50,10 @@ class GUIClient(QMainWindow):
     batchFile = None
     # 批量logo 地址
     batchLogoPath = None
+    # 批量二维码 样式
+    batchStyle = 'normal'
+    # 批量二维码生成进度条
+    batchProgressBar = None
 
     """
     **kwargs:
@@ -446,17 +450,58 @@ class GUIClient(QMainWindow):
         self.batchLogoLabel.mousePressEvent = self.batchChooseLogo
 
         # 样式按钮
-        batchStyleButton = QPushButton('样式', self.batchWidget)
-        batchStyleButton.resize(100, 35)
+        batchStyleButton = QLabel(self.batchWidget)
+        batchStyleButton.resize(50, 35)
         batchStyleButton.move(400, 215)
+        batchStyleButton.setText('样式: ')
+        batchStyleButton.setStyleSheet('QLabel { font-size: 14px }')
+        batchStyleButton.setToolTip('点我选择样式')
+        batchStyleButton.setCursor(Qt.PointingHandCursor)
+        batchStyleButton.mousePressEvent = self.batchChooseStyle
 
         # 样式内容label
-        batchStyleLabel = QLabel(self.batchWidget)
-        batchStyleLabel.resize(100, 20)
-        batchStyleLabel.move(520, 230)
-        batchStyleLabel.setStyleSheet('QLabel { background-color: white }')
+        self.batchStyleLabel = QLabel(self.batchWidget)
+        self.batchStyleLabel.resize(148, 35)
+        self.batchStyleLabel.move(450, 215)
+        self.batchStyleLabel.setStyleSheet('QLabel { background-color: white; font-size: 14px }')
+        self.batchStyleLabel.setText(self.batchStyle)
+        self.batchStyleLabel.setCursor(Qt.PointingHandCursor)
+        self.batchStyleLabel.mousePressEvent = self.batchChooseStyle
+
+        # 二维码生成进度条
+        self.batchProgressBar = QProgressBar(self.batchWidget)
+        self.batchProgressBar.setTextVisible(False)
+        self.batchProgressBar.setGeometry(140, 270, 720, 5)
+        self.batchProgressBar.setHidden(True)
+
+
+        # 批量二维码生成日志容器
+        self.batchLogBox = QTextEdit(self.batchWidget)
+        self.batchLogBox.resize(720, 150)
+        self.batchLogBox.move(140, 300)
+        self.batchLogBox.setReadOnly(True)  # 只读, 由程序填入数据
+        self.batchLogBox.setHidden(True)
+        # self.batchLogBox.append('<p style="color: red;margin:2"> 你好</p>')
 
         self.setCentralWidget(self.batchWidget)
+
+    """
+    批量二维码样式选择
+    """
+    def batchChooseStyle(self, event):
+        print('---batchChooseStyle---')
+        dialog = StyleDialog(self, styleDir=self.config['style_dir'])
+        dialog.styleChosenSignal.connect(self.batchStyleChosen)
+        if dialog.exec_():
+            pass
+
+    """
+    批量二维码样式选中
+    """
+    def batchStyleChosen(self, style):
+        print('---batchStyleChosen---')
+        self.batchStyle = style
+        self.batchStyleLabel.setText(self.batchStyle)
 
     """
     批量页面选择logo
@@ -505,12 +550,26 @@ class GUIClient(QMainWindow):
                     item.append(sheet.cell(row=i,column=j).value)
                 data.append(item)
 
+            print(data)
             # 文件夹不存在的话需要新建一个文件夹
             savePath = os.path.join(getDesktopPath(), 'pics')
             QRTool = QRCode()
-            for vo in data:
+
+            # 准备进度条数据
+            dataLength = len(data)
+            self.batchProgressBar.setHidden(False)
+            self.batchLogBox.setHidden(False)
+
+            for i, vo in enumerate(data):
+                print(i)
+                print(vo)
                 img = QRTool.make(vo[0])
                 img.save(os.path.join(savePath, vo[0] + '.png'))
+                self.batchProgressBar.setValue(int( ( i + 1) / dataLength ) * 100 )
+                self.batchLogBox.append('<p style="margin:2">{} 生成成功</p>'.format(vo[0]))
+
+            # TODO:: 二维码生成统计, 成功多少条, 失败多少条
+            # TODO::二维码生成完成之后. 弹出对话框, 生成
 
         else:
             QMessageBox.warning(self, ' ', '请先上传文件', QMessageBox.Ok)
@@ -523,6 +582,9 @@ class GUIClient(QMainWindow):
         if fname[0]:
             self.batchFile = fname[0]
             self.filePathInput.setText(fname[0])
+        self.batchProgressBar.setHidden(True)
+        self.batchLogBox.clear()
+        self.batchLogBox.setHidden(True)
 
     # 下载批量模板
     def downloadBatchTemplate(self):
