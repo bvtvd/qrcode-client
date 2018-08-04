@@ -18,6 +18,7 @@ from utils.StyleDialog import StyleDialog
 from PIL import Image
 from utils.Helper import center, getDesktopPath
 from openpyxl import load_workbook
+from openpyxl.utils.exceptions import InvalidFileException
 
 
 class GUIClient(QMainWindow):
@@ -533,7 +534,11 @@ class GUIClient(QMainWindow):
     def batchQRCodeCreate(self):
         print('---batchQRCodeCreate---')
         if self.batchFile:
-            excel = load_workbook(self.batchFile)
+            try:
+                excel = load_workbook(self.batchFile)
+            except InvalidFileException:
+                QMessageBox.warning(self, ' ', '文件错误, 请上传带 .xlsx 后缀文件', QMessageBox.Ok)
+                return
             sheetnames = excel.sheetnames
             print(sheetnames)
             sheet = excel[sheetnames[0]]
@@ -557,13 +562,17 @@ class GUIClient(QMainWindow):
 
             # 准备进度条数据
             dataLength = len(data)
+
+            # 进度条和日志框 清理
             self.batchProgressBar.setHidden(False)
             self.batchLogBox.setHidden(False)
+            self.batchProgressBar.setValue(0)
+            self.batchLogBox.clear()
 
             for i, vo in enumerate(data):
                 print(i)
                 print(vo)
-                img = QRTool.make(vo[0])
+                img = QRTool.make(vo[0], self.batchLogoPath, self.batchStyle)
                 img.save(os.path.join(savePath, vo[0] + '.png'))
                 self.batchProgressBar.setValue(int( ( i + 1) / dataLength ) * 100 )
                 self.batchLogBox.append('<p style="margin:2">{} 生成成功</p>'.format(vo[0]))
