@@ -19,6 +19,7 @@ from PIL import Image
 from utils.Helper import center, getDesktopPath
 from openpyxl import load_workbook
 from openpyxl.utils.exceptions import InvalidFileException
+import time
 
 
 class GUIClient(QMainWindow):
@@ -573,9 +574,10 @@ class GUIClient(QMainWindow):
                 print(i)
                 print(vo)
                 img = QRTool.make(vo[0], self.batchLogoPath, self.batchStyle)
-                img.save(os.path.join(savePath, vo[0] + '.png'))
+                img.save(os.path.join(savePath, str(vo[0]) + '.png'))
                 self.batchProgressBar.setValue(int( ( i + 1) / dataLength ) * 100 )
                 self.batchLogBox.append('<p style="margin:2">{} 生成成功</p>'.format(vo[0]))
+                time.sleep(1)
 
             # TODO:: 二维码生成统计, 成功多少条, 失败多少条
             # TODO::二维码生成完成之后. 弹出对话框, 生成
