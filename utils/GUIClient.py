@@ -15,6 +15,7 @@ from PyQt5.QtCore import Qt, pyqtSlot
 from utils.QRCode import QRCode
 from utils.LogoDialog import LogoDialog
 from utils.StyleDialog import StyleDialog
+from utils.BatchGenerateThread import BatchGenerateThread
 from PIL import Image
 from utils.Helper import center, getDesktopPath
 from openpyxl import load_workbook
@@ -540,29 +541,9 @@ class GUIClient(QMainWindow):
             except InvalidFileException:
                 QMessageBox.warning(self, ' ', '文件错误, 请上传带 .xlsx 后缀文件', QMessageBox.Ok)
                 return
-            sheetnames = excel.sheetnames
-            print(sheetnames)
-            sheet = excel[sheetnames[0]]
-            print(sheet)
-            # 整合表数据
-            # 数据格式 [ {}, {}, {} ]
-            print(sheet.max_column)
-            print(sheet.max_row)
-            # print(sheet.cell(row=1, column=1).value)
-            data = []
-            for i in range(2, sheet.max_row + 1):
-                item = []
-                for j in range(1, sheet.max_column + 1):
-                    item.append(sheet.cell(row=i,column=j).value)
-                data.append(item)
 
-            print(data)
-            # 文件夹不存在的话需要新建一个文件夹
+            # 要生成一个保存路径
             savePath = os.path.join(getDesktopPath(), 'pics')
-            QRTool = QRCode()
-
-            # 准备进度条数据
-            dataLength = len(data)
 
             # 进度条和日志框 清理
             self.batchProgressBar.setHidden(False)
@@ -570,20 +551,25 @@ class GUIClient(QMainWindow):
             self.batchProgressBar.setValue(0)
             self.batchLogBox.clear()
 
-            for i, vo in enumerate(data):
-                print(i)
-                print(vo)
-                img = QRTool.make(vo[0], self.batchLogoPath, self.batchStyle)
-                img.save(os.path.join(savePath, str(vo[0]) + '.png'))
-                self.batchProgressBar.setValue(int( ( i + 1) / dataLength ) * 100 )
-                self.batchLogBox.append('<p style="margin:2">{} 生成成功</p>'.format(vo[0]))
-                time.sleep(1)
+            # 实例化线程
+            self.batchGenerateThread = BatchGenerateThread(self.batchFile, savePath, self.batchLogoPath, self.batchStyle)
+            # 线程信号处理
+            self.batchGenerateThread.signal.connect(self.batchGenerateThreadSignalHandler)
+            self.batchGenerateThread.start()    # 开启线程
 
             # TODO:: 二维码生成统计, 成功多少条, 失败多少条
             # TODO::二维码生成完成之后. 弹出对话框, 生成
 
         else:
             QMessageBox.warning(self, ' ', '请先上传文件', QMessageBox.Ok)
+
+    """
+    批量生成
+    """
+    def batchGenerateThreadSignalHandler(self, data):
+        print('---batchGenerateThreadSignalHandler---')
+        data.get('progressBarValue') and self.batchProgressBar.setValue(data.get('progressBarValue'))
+        data.get('message') and self.batchLogBox.append(data.get('message'))
 
     """
     上传批量模板
