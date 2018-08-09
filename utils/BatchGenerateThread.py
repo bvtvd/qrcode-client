@@ -22,12 +22,12 @@ class BatchGenerateThread(QThread):
     batchLogoPath: logo 路径
     batchStyle: 样式
     """
-    def __init__(self, batchFile, savePath, batchLogoPath, batchStyle):
+    def __init__(self, parent = None):
         super(BatchGenerateThread, self).__init__()
-        self.batchFile = batchFile
-        self.savePath = savePath
-        self.batchLogoPath = batchLogoPath
-        self.batchStyle = batchStyle
+        self.batchFile = parent.batchFile
+        self.savePath = parent.batchSavePath
+        self.batchLogoPath = parent.batchLogoPath
+        self.batchStyle = parent.batchStyle
 
     def run(self):
         # 读取文件
@@ -73,7 +73,12 @@ class BatchGenerateThread(QThread):
         message = '执行完毕, 共处理 {} 条数据, 成功生成 {} 个二维码, 失败 {} 个.'.format(dataLength, success, fail)
         self.signal.emit({'progressBarValue': 100, 'message': message})
         # TODO::二维码生成完成之后. 弹出对话框, 生成
+        # messageBox = QMessageBox.information(self.parent, ' ', '执行完成')
+        # messageBox.addButton('确定', QMessageBox.YesRole)
+        # messageBox.exec_()
 
+
+        # os.system('explorer.exe "{}"'.format(self.savePath))
 
 
 

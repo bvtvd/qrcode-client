@@ -543,7 +543,7 @@ class GUIClient(QMainWindow):
                 return
 
             # 要生成一个保存路径
-            savePath = os.path.join(getDesktopPath(), 'pics')
+            self.batchSavePath = os.path.join(getDesktopPath(), 'pics')
 
             # 进度条和日志框 清理
             self.batchProgressBar.setHidden(False)
@@ -552,16 +552,39 @@ class GUIClient(QMainWindow):
             self.batchLogBox.clear()
 
             # 实例化线程
-            self.batchGenerateThread = BatchGenerateThread(self.batchFile, savePath, self.batchLogoPath, self.batchStyle)
+            self.batchGenerateThread = BatchGenerateThread(self)
             # 线程信号处理
             self.batchGenerateThread.signal.connect(self.batchGenerateThreadSignalHandler)
             self.batchGenerateThread.start()    # 开启线程
+            self.batchGenerateThread.finished.connect(self.batchGenerateThreadFinished) # 线程结束处理时间
 
             # TODO:: 二维码生成统计, 成功多少条, 失败多少条
             # TODO::二维码生成完成之后. 弹出对话框, 生成
 
         else:
             QMessageBox.warning(self, ' ', '请先上传文件', QMessageBox.Ok)
+
+    """
+    批量生成线程借宿事件
+    """
+    def batchGenerateThreadFinished(self):
+        print('---batchGenerateThreadFinished---')
+        # messageBox = QMessageBox.information(self, ' ', '执行完成', QMessageBox.Yes | QMessageBox.No)
+        messageBox = QMessageBox(self)
+        messageBox.setWindowTitle(' ')
+        messageBox.setText('执行成功')
+        # messageBox.addButton(QPushButton('打开文件夹'), QMessageBox.YesRole)
+        # messageBox.addButton(QPushButton('取消'), QMessageBox.NoRole)
+        messageBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        buttonY = messageBox.button(QMessageBox.Yes)
+        buttonY.setText('打开文件夹')
+        buttonN = messageBox.button(QMessageBox.No)
+        buttonN.setText('取消')
+        messageBox.exec_()
+        if messageBox.clickedButton() == buttonY:
+            print('点击了yes')
+            # 打开文件夹
+            os.system('explorer.exe "{}"'.format(self.batchSavePath))
 
     """
     批量生成
