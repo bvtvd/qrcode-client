@@ -1,4 +1,4 @@
-##### a qrcode-generate client
+#### a qrcode-generate client
 
 python version: Python3
 
