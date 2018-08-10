@@ -57,6 +57,8 @@ class GUIClient(QMainWindow):
     batchStyle = 'normal'
     # 批量二维码生成进度条
     batchProgressBar = None
+    # 批量生成二维码尺寸数值
+    batchSize = 280
 
     """
     **kwargs:
@@ -455,7 +457,7 @@ class GUIClient(QMainWindow):
         # 样式按钮
         batchStyleButton = QLabel(self.batchWidget)
         batchStyleButton.resize(50, 35)
-        batchStyleButton.move(400, 215)
+        batchStyleButton.move(300, 215)
         batchStyleButton.setText('样式: ')
         batchStyleButton.setStyleSheet('QLabel { font-size: 14px }')
         batchStyleButton.setToolTip('点我选择样式')
@@ -465,11 +467,29 @@ class GUIClient(QMainWindow):
         # 样式内容label
         self.batchStyleLabel = QLabel(self.batchWidget)
         self.batchStyleLabel.resize(148, 35)
-        self.batchStyleLabel.move(450, 215)
+        self.batchStyleLabel.move(350, 215)
         self.batchStyleLabel.setStyleSheet('QLabel { background-color: white; font-size: 14px }')
         self.batchStyleLabel.setText(self.batchStyle)
         self.batchStyleLabel.setCursor(Qt.PointingHandCursor)
         self.batchStyleLabel.mousePressEvent = self.batchChooseStyle
+
+        # 尺寸字样
+        batchSizeButton = QLabel('尺寸: ', self.batchWidget)
+        batchSizeButton.setGeometry(548, 215, 50, 35)
+        batchSizeButton.setStyleSheet('QLabel { font-size: 14px }')
+
+        # 尺寸滑条
+        self.batchSizeSlider = QSlider(Qt.Horizontal, self.batchWidget)
+        self.batchSizeSlider.setFocusPolicy(Qt.NoFocus)
+        self.batchSizeSlider.setMinimum(50)
+        self.batchSizeSlider.setMaximum(800)
+        self.batchSizeSlider.setValue(self.batchSize)
+        self.batchSizeSlider.setGeometry(598, 225, 205, 20)
+        self.batchSizeSlider.valueChanged[int].connect(self.batchSizeSliderChanged)
+
+        # 尺寸滑条数值显示
+        self.batchSizeLabel = QLabel('{}px'.format(self.batchSize), self.batchWidget)
+        self.batchSizeLabel.setGeometry(813, 215, 40, 35)
 
         # 二维码生成进度条
         self.batchProgressBar = QProgressBar(self.batchWidget)
@@ -487,6 +507,14 @@ class GUIClient(QMainWindow):
         # self.batchLogBox.append('<p style="color: red;margin:2"> 你好</p>')
 
         self.setCentralWidget(self.batchWidget)
+
+    """
+    批量尺寸滑条变动
+    """
+    def batchSizeSliderChanged(self, value):
+        print('---batchSizeSliderChanged---')
+        self.batchSize = value
+        self.batchSizeLabel.setText('{}px'.format(self.batchSize))
 
     """
     批量二维码样式选择

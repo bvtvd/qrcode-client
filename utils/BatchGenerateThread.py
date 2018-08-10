@@ -22,6 +22,7 @@ class BatchGenerateThread(QThread):
     savePath: 生成二维码保存路径
     batchLogoPath: logo 路径
     batchStyle: 样式
+    batchSize: 图片大小
     """
     def __init__(self, parent = None):
         super(BatchGenerateThread, self).__init__()
@@ -29,6 +30,7 @@ class BatchGenerateThread(QThread):
         self.savePath = parent.batchSavePath
         self.batchLogoPath = parent.batchLogoPath
         self.batchStyle = parent.batchStyle
+        self.batchSize = parent.batchSize
 
     def run(self):
         # 读取文件
@@ -62,7 +64,7 @@ class BatchGenerateThread(QThread):
                 except IndexError:
                     pass
 
-                img.save(os.path.join(self.savePath, imgName))
+                img.resize((self.batchSize, self.batchSize)).save(os.path.join(self.savePath, imgName))
                 message = '<p style="margin:2">{} 生成成功</p>'.format(vo[0])
                 success = success + 1
             except:
