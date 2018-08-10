@@ -543,8 +543,9 @@ class GUIClient(QMainWindow):
                 return
 
             # 要生成一个保存路径
-            self.batchSavePath = os.path.join(getDesktopPath(), 'pics')
-
+            # self.batchSavePath = os.path.join(getDesktopPath(), 'pics')
+            self.batchSavePath = QFileDialog.getExistingDirectory(self.batchWidget, '选择保存路径', getDesktopPath())
+            print(self.batchSavePath)
             # 进度条和日志框 清理
             self.batchProgressBar.setHidden(False)
             self.batchLogBox.setHidden(False)
@@ -556,16 +557,13 @@ class GUIClient(QMainWindow):
             # 线程信号处理
             self.batchGenerateThread.signal.connect(self.batchGenerateThreadSignalHandler)
             self.batchGenerateThread.start()    # 开启线程
-            self.batchGenerateThread.finished.connect(self.batchGenerateThreadFinished) # 线程结束处理时间
-
-            # TODO:: 二维码生成统计, 成功多少条, 失败多少条
-            # TODO::二维码生成完成之后. 弹出对话框, 生成
-
+            self.batchGenerateThread.finished.connect(self.batchGenerateThreadFinished) # 线程结束处理事件
         else:
             QMessageBox.warning(self, ' ', '请先上传文件', QMessageBox.Ok)
 
     """
-    批量生成线程借宿事件
+    批量生成线程结束事件
+    弹出对话框询问是否打开文件夹
     """
     def batchGenerateThreadFinished(self):
         print('---batchGenerateThreadFinished---')
@@ -584,7 +582,9 @@ class GUIClient(QMainWindow):
         if messageBox.clickedButton() == buttonY:
             print('点击了yes')
             # 打开文件夹
-            os.system('explorer.exe "{}"'.format(self.batchSavePath))
+            print(self.batchSavePath)
+            # os.system('explorer.exe "{}"'.format(self.batchSavePath))
+            os.startfile(self.batchSavePath)
 
     """
     批量生成
@@ -609,7 +609,7 @@ class GUIClient(QMainWindow):
     # 下载批量模板
     def downloadBatchTemplate(self):
         print('---downloadBatchTemplate---')
-        name = 'template.xlsx'
+        name = 'example.xlsx'
         templatePath = self.getStorage(name)
         if os.path.exists(templatePath):
             savePath = os.path.join(getDesktopPath(), name)

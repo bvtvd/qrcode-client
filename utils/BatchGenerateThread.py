@@ -12,6 +12,7 @@ from PyQt5.QtCore import QThread, pyqtSignal
 from openpyxl import load_workbook
 from utils.QRCode import QRCode
 import os
+import sys
 
 class BatchGenerateThread(QThread):
     signal = pyqtSignal(dict)
@@ -65,20 +66,14 @@ class BatchGenerateThread(QThread):
                 message = '<p style="margin:2">{} 生成成功</p>'.format(vo[0])
                 success = success + 1
             except:
+                print('error: ', sys.exc_info()[0])
                 fail = fail + 1
                 message = '<p style="margin:2;color:red">{} 生成失败</p>'.format(vo[0])
             self.signal.emit({'progressBarValue': progressBarValue, 'message': message})
 
-        # TODO:: 二维码生成统计, 成功多少条, 失败多少条
         message = '执行完毕, 共处理 {} 条数据, 成功生成 {} 个二维码, 失败 {} 个.'.format(dataLength, success, fail)
         self.signal.emit({'progressBarValue': 100, 'message': message})
-        # TODO::二维码生成完成之后. 弹出对话框, 生成
-        # messageBox = QMessageBox.information(self.parent, ' ', '执行完成')
-        # messageBox.addButton('确定', QMessageBox.YesRole)
-        # messageBox.exec_()
 
-
-        # os.system('explorer.exe "{}"'.format(self.savePath))
 
 
 
