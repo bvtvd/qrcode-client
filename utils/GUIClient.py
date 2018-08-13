@@ -39,6 +39,8 @@ class GUIClient(QMainWindow):
     singleWidget = None
     # 单个二维码预览空间
     previewSquare = None
+    # 单个二维码保存路径
+    singleSavePath = getDesktopPath()
     # 批量二维码生成页面
     batchWidget = None
     # 单个二维码生成滑条数值
@@ -400,10 +402,13 @@ class GUIClient(QMainWindow):
 
         img = self.singleQRCodeCreate()
         if img:
-            imgName = time.strftime('%Y%m%d%H%M%S',time.localtime(time.time())) + str(random.randint(1000, 9999))
-            fname = QFileDialog.getSaveFileName(self, '保存', imgName, "*.png;;*.jpg;;*.jpeg;;*.gif;;*.bmp")
+            imgName = time.strftime('%Y%m%d%H%M%S', time.localtime(time.time())) + str(random.randint(1000, 9999))
+            savePath = os.path.join(self.singleSavePath, imgName)
+            fname = QFileDialog.getSaveFileName(self, '保存', savePath, "*.png;;*.jpg;;*.jpeg;;*.gif;;*.bmp")
             img = img.resize((self.pictureSizeValue, self.pictureSizeValue))
-            fname[0] and img.save(fname[0])
+            if fname[0]:
+                self.singleSavePath = os.path.dirname(fname[0]) # 缓存保存路径
+                img.save(fname[0])
 
     """
     渲染批量生成二维码界面
