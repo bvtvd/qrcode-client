@@ -108,7 +108,9 @@ class GUIClient(QMainWindow):
         self.initMenu() # 初始化菜单
         self.pageRender()   # 界面渲染
 
-        self.resize(self.config['window_width'], self.config['window_height'])   # 设置窗口大小
+        # self.resize(self.config['window_width'], self.config['window_height'])   # 设置窗口大小
+        # self.setWindowFlags(Qt.WindowMaximizeButtonHint)
+        self.setFixedSize(self.config['window_width'], self.config['window_height'])    # 设置固定窗口大小
         self.center()   # 窗口居中
         self.setWindowTitle(self.config['window_title'])   # 窗口标题
         self.setWindowIcon(QIcon(self.config['window_icon']))   # 设置窗口icon
@@ -120,6 +122,8 @@ class GUIClient(QMainWindow):
     def initMenu(self):
         print('---initMenu---')
         menuBar = self.menuBar()
+
+        # 菜单
         menuMenu = menuBar.addMenu('&菜单')
         self.setMenuSingle(self.config.get('spot_icon'))
         self.setMenuBatch(self.config.get('none_icon'))
@@ -132,6 +136,13 @@ class GUIClient(QMainWindow):
         exit = QAction(QIcon(self.getImage('exit.png')), '退出', self)
         exit.triggered.connect(self.close)
         menuMenu.addAction(exit)
+
+        # 帮助
+        helpMenu = menuBar.addMenu('&帮助')
+        manual = QAction('说明', self)
+        about = QAction('关于', self)
+        helpMenu.addAction(manual)
+        helpMenu.addAction(about)
 
     """
     设置单个生成菜单
