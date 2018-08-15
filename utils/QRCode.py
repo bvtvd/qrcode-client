@@ -158,7 +158,15 @@ class QRCode:
             logoWidth, logoHeight = logo.size
             x = int((imgWidth - logoWidth)/2)
             y = int((imgHeight - logoHeight)/2)
-            image.paste(logo, (x, y))
+
+            try:
+                # 分离通道
+                r, g, b , a = logo.split()
+                # 将透明通道作为mask 传入
+                image.paste(logo, (x, y), mask = a)
+            except ValueError:
+                # 有的图片没有透明背景通道
+                image.paste(logo, (x, y))
 
         return image
 
