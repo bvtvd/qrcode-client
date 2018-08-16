@@ -15,6 +15,7 @@ from PyQt5.QtCore import Qt, pyqtSlot
 from utils.QRCode import QRCode
 from utils.LogoDialog import LogoDialog
 from utils.StyleDialog import StyleDialog
+from utils.ManualDialog import ManualDialog
 from utils.BatchGenerateThread import BatchGenerateThread
 from PIL import Image
 from utils.Helper import center, getDesktopPath
@@ -140,9 +141,17 @@ class GUIClient(QMainWindow):
         # 帮助
         helpMenu = menuBar.addMenu('&帮助')
         manual = QAction('说明', self)
+        manual.triggered.connect(self.openManual)
         about = QAction('关于', self)
         helpMenu.addAction(manual)
         helpMenu.addAction(about)
+
+    """
+    点击使用说明
+    """
+    def openManual(self):
+        dialog = ManualDialog(self)
+        dialog.exec_()
 
     """
     设置单个生成菜单
