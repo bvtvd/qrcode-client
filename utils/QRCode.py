@@ -97,7 +97,7 @@ class QRCode:
     """
     生成二维码
     """
-    def make(self, content, logo = None, style = 'normal', error_correction = 2):
+    def make(self, content, logo = None, style = 'normal', error_correction = 2, border = False):
         img = None
         if style == 'normal':
             img = self.normal(content, logo, error_correction)
@@ -116,9 +116,29 @@ class QRCode:
         elif style == 'halfArtDataOnly':
             img = self.halfArtDataOnly(content, logo)
 
+        # if border:
+        #     img = self.addWhiteBorder(img)
+
         return img
 
+    """
+    给图片加白边
+    直接贴图图片易失真
+    """
+    def addWhiteBorder(self, img, factor = 0.75):
+        # 先生成一个图片大小的白底
+        w, h = img.size
+        back = Image.new('RGBA', (w, h), (255, 255, 255))
 
+        # 计算图片缩放长宽
+        newW = int(w * factor)
+        img = img.resize((newW, newW), Image.ANTIALIAS)
+        # img = img.resize((newW, newW))
+
+        # 计算贴图位置
+        x = int((w * (1 - factor)) / 2)
+        back.paste(img, (x, x))
+        return back
 
 
     """
@@ -155,6 +175,7 @@ class QRCode:
             # logo = self.circleBorderImage(logo)   # 给 logo 加圆角
             # logo大小重置
             logo = logo.resize((sizeWidth, sizeHeight), Image.ANTIALIAS)
+            # logo = logo.resize((sizeWidth, sizeHeight))
             logoWidth, logoHeight = logo.size
             x = int((imgWidth - logoWidth)/2)
             y = int((imgHeight - logoHeight)/2)

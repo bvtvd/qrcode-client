@@ -363,7 +363,7 @@ class GUIClient(QMainWindow):
 
             QRTool = QRCode()
             errorCorrection = self.transferErrorCorrectionValue()
-            return QRTool.make(content, self.logoPath, self.style, errorCorrection)
+            return QRTool.make(content, self.logoPath, self.style, errorCorrection, True)
 
     """
     转化容错值
