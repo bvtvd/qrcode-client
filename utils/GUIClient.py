@@ -13,9 +13,7 @@ from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QApplication, QAction, 
 from PyQt5.QtGui import QIcon, QPixmap, QPicture, QImage
 from PyQt5.QtCore import Qt, pyqtSlot
 from utils.QRCode import QRCode
-from utils.LogoDialog import LogoDialog
-from utils.StyleDialog import StyleDialog
-from utils.ManualDialog import ManualDialog
+from utils.Dialog import LogoDialog, StyleDialog, ManualDialog
 from utils.BatchGenerateThread import BatchGenerateThread
 from PIL import Image
 from utils.Helper import center, getDesktopPath
