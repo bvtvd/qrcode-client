@@ -9,6 +9,7 @@
 '''
 
 from PyQt5.QtWidgets import QDialog, QTextEdit
+from PyQt5.QtWebEngineWidgets import QWebEngineView
 from utils.Helper import center
 
 class ManualDialog(QDialog):
@@ -18,9 +19,13 @@ class ManualDialog(QDialog):
         self.initUI()
 
     def initUI(self):
-        text = QTextEdit(self)
-        text.setGeometry( 0, 0, 800, 600)
-        text.setHtml(self.getHtml())
+        # text = QTextEdit(self)
+        # text.setGeometry( 0, 0, 800, 600)
+        # text.setHtml(self.getHtml())
+        browser = QWebEngineView(self)
+        browser.setGeometry(0, 0, 800, 600)
+        browser.setHtml(self.getHtml())
+
 
         self.setWindowTitle('使用说明')
         self.setFixedSize(800, 600)
