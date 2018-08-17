@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QApplication, QAction, 
 from PyQt5.QtGui import QIcon, QPixmap, QPicture, QImage
 from PyQt5.QtCore import Qt, pyqtSlot
 from utils.QRCode import QRCode
-from utils.Dialog import LogoDialog, StyleDialog, ManualDialog
+from utils.Dialog import LogoDialog, StyleDialog, ManualDialog, AboutDialog
 from utils.BatchGenerateThread import BatchGenerateThread
 from PIL import Image
 from utils.Helper import center, getDesktopPath
@@ -141,8 +141,17 @@ class GUIClient(QMainWindow):
         manual = QAction('说明', self)
         manual.triggered.connect(self.openManual)
         about = QAction('关于', self)
+        about.triggered.connect(self.openAbout)
         helpMenu.addAction(manual)
         helpMenu.addAction(about)
+
+    """
+    点击关于
+    """
+    def openAbout(self):
+        dialog = AboutDialog(self)
+        dialog.exec_()
+
 
     """
     点击使用说明

@@ -8,7 +8,7 @@
 @desc: 各种自定义 对话框
 """
 
-from PyQt5.QtWidgets import QDialog, QListWidget, QListView, QListWidgetItem, QPushButton, QFileDialog, QMessageBox, QMenu
+from PyQt5.QtWidgets import QDialog, QListWidget, QListView, QListWidgetItem, QPushButton, QFileDialog, QMessageBox, QMenu, QLabel
 from PyQt5.QtGui import QIcon, QCursor
 from PyQt5.QtCore import QSize, pyqtSignal, Qt, QPoint
 from PyQt5.QtWebEngineWidgets import QWebEngineView
@@ -819,4 +819,27 @@ class ManualDialog(QDialog):
 
 
 
+"""
+关于弹窗
+"""
+class AboutDialog(QDialog):
+    
+    def __init__(self, parent = None):
+        super(AboutDialog, self).__init__(parent)
+        self.initUI()
 
+    def initUI(self):
+        style = 'QLabel {font-size: 15px}'
+        name = QLabel('作者: Hans', self)
+        name.move(150, 50)
+        name.setStyleSheet(style)
+        email = QLabel('邮箱: hans01@foxmail.com', self)
+        email.move(100, 100)
+        email.setStyleSheet(style)
+
+        self.setWindowTitle('关于')
+        self.setFixedSize(400, 200)
+        self.center()
+
+    def center(self):
+        center(self)
