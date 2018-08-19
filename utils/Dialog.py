@@ -11,7 +11,7 @@
 from PyQt5.QtWidgets import QDialog, QListWidget, QListView, QListWidgetItem, QPushButton, QFileDialog, QMessageBox, QMenu, QLabel
 from PyQt5.QtGui import QIcon, QCursor
 from PyQt5.QtCore import QSize, pyqtSignal, Qt, QPoint
-from PyQt5.QtWebEngineWidgets import QWebEngineView
+# from PyQt5.QtWebEngineWidgets import QWebEngineView
 from utils.Helper import center
 import os
 import shutil

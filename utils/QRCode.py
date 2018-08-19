@@ -9,7 +9,7 @@
 """
 
 import qrcode
-from pyqart import QArtist, QrHalftonePrinter, QrImagePrinter, QrPainter
+from pyqart import QArtist, QrHalftonePrinter, QrImagePrinter, QrPainter, QrStringPrinter
 from PIL import Image, ImageDraw
 
 """
@@ -100,7 +100,7 @@ class QRCode:
     def make(self, content, logo = None, style = 'normal', error_correction = 2, border = False):
         img = None
         if style == 'normal':
-            img = self.normal(content, logo, error_correction)
+            img = self.normal(content, logo)
         elif style == 'halftone':
             img = self.halftone(content, logo)
         elif style == 'halftoneColorful':
@@ -146,16 +146,27 @@ class QRCode:
     """
     def normal(self, content, logo,  error_correction = 2):
         qr = qrcode.QRCode(
-            version=1,
+            version=None,
             error_correction=error_correction,
             box_size=12,
-            border=0,
+            border=4,
         )
         qr.add_data(content)
         qr.make(fit=True)
         # qr.make()
         img =  qr.make_image()
         return self.pasteLogo(img, logo)
+
+    """
+    生成普通二维码2
+    """
+    def normal2(self, content, logo):
+            painter = self.getPainter(content)
+            img =  QrImagePrinter.print(painter, point_width=self.POINT_PIXEL, border_width=10)
+            # img =  QrImagePrinter.print(painter, point_width=24)
+            # img =  QrStringPrinter.print(painter, point_width=24)
+            return self.pasteLogo(img, logo)
+
 
     """
     给二维码贴logo
@@ -291,39 +302,42 @@ if __name__ == '__main__':
     content = 'https://www.jianshu.com/u/ef64b2653e5e'
     background_image = '../images/nana.jpg'
     tool = QRCode()
+
+    img = tool.normal2('1', None)
+    img.show()
     # tool.make('这就是你的不对了', 800).show()
     # img = tool.HalftoneColorful('1')
     # img = tool.halftone('你好啊, nana', '../images/nana.jpg')
     # img = tool.halftoneColorful('你好啊, nana', '../images/nana.jpg')
     # img = tool.halftonePixel('你好啊, nana', '../images/nana.jpg')
     # normal
-    img = tool.make(content)
-    img.resize((150, 150)).save('../images/styles/0_normal.jpg')
-
-    # halftone
-    img = tool.halftone(content, background_image)
-    img.resize((150, 150)).save('../images/styles/1_halftone.jpg')
-
-    # halftone colorful
-    img = tool.halftoneColorful(content, background_image)
-    img.resize((150, 150)).save('../images/styles/2_halftoneColorful.jpg')
-
-    # halftone pixel
-    img = tool.halftonePixel(content, background_image)
-    img.resize((150, 150)).save('../images/styles/3_halftonePixel.jpg')
-
-    # qart
-    img = tool.qart(content, background_image)
-    img.resize((150, 150)).save('../images/styles/4_qart.jpg')
-
-    # qart data only
-    img = tool.qartDataOnly(content, background_image)
-    img.resize((150, 150)).save('../images/styles/5_qartDataOnly.jpg')
-
-    # halfArt
-    img = tool.halfArt(content, background_image)
-    img.resize((150, 150)).save('../images/styles/6_halfArt.jpg')
-
-    # halfArt data only
-    img = tool.halfArtDataOnly(content, background_image)
-    img.resize((150, 150)).save('../images/styles/7_halfArtDataOnly.jpg')
+    # img = tool.make(content)
+    # img.resize((150, 150)).save('../images/styles/0_normal.jpg')
+    #
+    # # halftone
+    # img = tool.halftone(content, background_image)
+    # img.resize((150, 150)).save('../images/styles/1_halftone.jpg')
+    #
+    # # halftone colorful
+    # img = tool.halftoneColorful(content, background_image)
+    # img.resize((150, 150)).save('../images/styles/2_halftoneColorful.jpg')
+    #
+    # # halftone pixel
+    # img = tool.halftonePixel(content, background_image)
+    # img.resize((150, 150)).save('../images/styles/3_halftonePixel.jpg')
+    #
+    # # qart
+    # img = tool.qart(content, background_image)
+    # img.resize((150, 150)).save('../images/styles/4_qart.jpg')
+    #
+    # # qart data only
+    # img = tool.qartDataOnly(content, background_image)
+    # img.resize((150, 150)).save('../images/styles/5_qartDataOnly.jpg')
+    #
+    # # halfArt
+    # img = tool.halfArt(content, background_image)
+    # img.resize((150, 150)).save('../images/styles/6_halfArt.jpg')
+    #
+    # # halfArt data only
+    # img = tool.halfArtDataOnly(content, background_image)
+    # img.resize((150, 150)).save('../images/styles/7_halfArtDataOnly.jpg')
