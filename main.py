@@ -9,7 +9,7 @@
 """
 import sys
 from PyQt5.QtWidgets import QApplication
-from utils.GUIClient import GUIClient
+from utils import GUIClient
 
 if __name__ == '__main__':
 

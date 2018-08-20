@@ -10,8 +10,6 @@
 
 from PyQt5.QtCore import QThread, pyqtSignal
 from utils.QRCode import QRCode
-import os
-import sys
 
 class SingleGenerateThread(QThread):
     signal = pyqtSignal(str)

@@ -10,7 +10,7 @@
 
 from PyQt5.QtCore import QThread, pyqtSignal
 from openpyxl import load_workbook
-from utils import QRCode
+from utils.QRCode import QRCode
 import os
 import sys
 
