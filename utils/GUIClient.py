@@ -9,12 +9,10 @@
 """
 
 import sys, time, random, os, shutil
-from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QApplication, QAction, QHBoxLayout, QVBoxLayout, QTextEdit, QPushButton, QWidget, QLabel, QFrame, QGridLayout, QMessageBox, QFileDialog, QSlider, QLineEdit, QProgressBar
-from PyQt5.QtGui import QIcon, QPixmap, QPicture, QImage
-from PyQt5.QtCore import Qt, pyqtSlot
-from utils.QRCode import QRCode
-from utils.Dialog import LogoDialog, StyleDialog, ManualDialog, AboutDialog
-from utils.BatchGenerateThread import BatchGenerateThread
+from PyQt5.QtWidgets import QMainWindow, QApplication, QAction, QTextEdit, QPushButton, QWidget, QLabel, QMessageBox, QFileDialog, QSlider, QLineEdit, QProgressBar
+from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtCore import Qt
+from utils import BatchGenerateThread, SingleGenerateThread, LogoDialog, StyleDialog, ManualDialog, AboutDialog
 from PIL import Image
 from utils.Helper import center, getDesktopPath
 from openpyxl import load_workbook
@@ -377,9 +375,13 @@ class GUIClient(QMainWindow):
                 QMessageBox.warning(self, '  ', '请在 logo 中选择背景图片', QMessageBox.Ok)
                 return
 
-            QRTool = QRCode()
-            errorCorrection = self.transferErrorCorrectionValue()
-            return QRTool.make(content, self.logoPath, self.style, errorCorrection, True)
+            # QRTool = QRCode()
+            # errorCorrection = self.transferErrorCorrectionValue()
+            # return QRTool.make(content, self.logoPath, self.style, errorCorrection)
+            # 使用线程类来处理
+            self.singleGenerateThread = SingleGenerateThread(content, self)
+            self.singleGenerateThread.signal.connect(self.singleQRCodeReady)
+            self.singleGenerateThread.start()   # 运行线程
 
     """
     转化容错值
@@ -401,23 +403,35 @@ class GUIClient(QMainWindow):
         print('---singleQRCodePreview---')
         self.previewSuqareLoading()
         img = self.singleQRCodeCreate()
-        if img:
-            img = img.resize((280, 280))
-            # 将图片缓存起来
-            img.save(self.config.get('single_qrcode_cache_key'))
-            # 展示在预览区
+        # if img:
+        #     img = img.resize((280, 280))
+        #     # 将图片缓存起来
+        #     img.save(self.config.get('single_qrcode_cache_key'))
+        #     # 展示在预览区
+        #     pixmap = QPixmap(self.config.get('single_qrcode_cache_key'))
+        #     self.previewSquare.setPixmap(pixmap)
+
+    """
+    单个二维码生成完毕
+    """
+    def singleQRCodeReady(self, data):
+        print('---singleQRCodeReady---')
+        if data == "OK":
             pixmap = QPixmap(self.config.get('single_qrcode_cache_key'))
             self.previewSquare.setPixmap(pixmap)
+            self.previewSquare.setScaledContents(True)
 
     """
     预览框加载动画
     """
     def previewSuqareLoading(self):
         print('---previewSuqareLoading---')
-        # self.previewSquare.setText(' 正在生成... ')
+        self.previewSquare.setText(' 正在生成... ')
+        self.previewSquare.setStyleSheet("QLabel { background-color: white; font-size: 14px;text-align: center }")
         # pixmap = QPixmap('./images/loading.png')
         # self.previewSquare.setPixmap(pixmap)
-        # self.previewSquare.setStyleSheet('QLabel {  }')
+        # self.previewSquare.setScaledContents(False)
+        self.previewSquare.setAlignment(Qt.AlignCenter)
 
     """
     单个二维码下载
@@ -427,7 +441,7 @@ class GUIClient(QMainWindow):
         # self.previewSuqareLoading()
         # return
 
-        img = self.singleQRCodeCreate()
+        img = Image.open(self.config.get('single_qrcode_cache_key'))
         if img:
             imgName = time.strftime('%Y%m%d%H%M%S', time.localtime(time.time())) + str(random.randint(1000, 9999))
             savePath = os.path.join(self.singleSavePath, imgName)

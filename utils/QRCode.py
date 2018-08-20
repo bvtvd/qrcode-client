@@ -9,7 +9,7 @@
 """
 
 import qrcode
-from pyqart import QArtist, QrHalftonePrinter, QrImagePrinter, QrPainter, QrStringPrinter
+from pyqart import QArtist, QrHalftonePrinter, QrImagePrinter, QrPainter
 from PIL import Image, ImageDraw
 
 """
@@ -18,7 +18,8 @@ QR Code Class
 class QRCode:
 
     QR_VERSION = 10
-    POINT_PIXEL = 3
+    POINT_PIXEL = 4
+    BORDER_WIDTH = 33
 
     def __init__(self):
         pass
@@ -97,14 +98,15 @@ class QRCode:
     """
     生成二维码
     """
-    def make(self, content, logo = None, style = 'normal', error_correction = 2, border = False):
+    def make(self, content, logo = None, style = 'normal', error_correction = 2):
         img = None
         if style == 'normal':
-            img = self.normal(content, logo)
+            img = self.normal(content, logo, error_correction)
         elif style == 'halftone':
             img = self.halftone(content, logo)
         elif style == 'halftoneColorful':
             img = self.halftoneColorful(content, logo)
+            print(img.size)
         elif style == 'halftonePixel':
             img = self.halftonePixel(content, logo)
         elif style == 'qart':
@@ -241,7 +243,7 @@ class QRCode:
     def halftone(self, content, background_image):
         if background_image:
             painter = self.getPainter(content)
-            return QrHalftonePrinter.print(painter, img = background_image, point_width=self.POINT_PIXEL, colorful=False)
+            return QrHalftonePrinter.print(painter, img = background_image, point_width=self.POINT_PIXEL, colorful=False, border_width=self.BORDER_WIDTH)
 
     """
     Halftone colorful
@@ -250,7 +252,7 @@ class QRCode:
     def halftoneColorful(self, content, background_image):
         if background_image:
             painter = self.getPainter(content)
-            return QrHalftonePrinter.print(painter, img=background_image, point_width=self.POINT_PIXEL)
+            return QrHalftonePrinter.print(painter, img=background_image, point_width=self.POINT_PIXEL, border_width=self.BORDER_WIDTH)
 
     """
     Halftone pixel
@@ -259,7 +261,7 @@ class QRCode:
     def halftonePixel(self, content, background_image):
         if background_image:
             painter = self.getPainter(content)
-            return QrHalftonePrinter.print(painter, img=background_image, point_width=self.POINT_PIXEL, colorful=False, pixelization=True)
+            return QrHalftonePrinter.print(painter, img=background_image, point_width=self.POINT_PIXEL, colorful=False, pixelization=True, border_width=self.BORDER_WIDTH)
 
     """
     Qart
@@ -268,7 +270,7 @@ class QRCode:
     def qart(self, content, background_image):
         if background_image:
             artist = self.getArtist(content, background_image)
-            return QrImagePrinter.print(artist, point_width=self.POINT_PIXEL)
+            return QrImagePrinter.print(artist, point_width=self.POINT_PIXEL, border_width=self.BORDER_WIDTH)
 
     """
     Qart data only
@@ -277,7 +279,7 @@ class QRCode:
     def qartDataOnly(self, content, background_image):
         if background_image:
             artist = self.getArtist(content, background_image, True)
-            return QrImagePrinter.print(artist, point_width=self.POINT_PIXEL)
+            return QrImagePrinter.print(artist, point_width=self.POINT_PIXEL, border_width=self.BORDER_WIDTH)
 
     """
     halfArt
@@ -286,7 +288,7 @@ class QRCode:
     def halfArt(self, content, background_image):
         if background_image:
             artist = self.getArtist(content, background_image)
-            return QrHalftonePrinter.print(artist, point_width=self.POINT_PIXEL)
+            return QrHalftonePrinter.print(artist, point_width=self.POINT_PIXEL, border_width=self.BORDER_WIDTH)
 
     """
     halfArt data only
@@ -295,7 +297,7 @@ class QRCode:
     def halfArtDataOnly(self, content, background_image):
         if background_image:
             artist = self.getArtist(content, background_image, True)
-            return QrHalftonePrinter.print(artist, point_width=self.POINT_PIXEL)
+            return QrHalftonePrinter.print(artist, point_width=self.POINT_PIXEL, border_width=self.BORDER_WIDTH)
 
 
 if __name__ == '__main__':
