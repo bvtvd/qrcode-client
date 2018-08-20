@@ -17,7 +17,6 @@ from PIL import Image
 from utils.Helper import center, getDesktopPath
 from openpyxl import load_workbook
 from openpyxl.utils.exceptions import InvalidFileException
-import time
 
 
 class GUIClient(QMainWindow):
